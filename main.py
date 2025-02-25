@@ -6,4 +6,4 @@ load_dotenv()
 
 strip = PyCololight(device="strip", host=os.getenv("STRIP_IP"), dynamic_effects=True)
 
-strip.on = 0
+strip.on = 25
