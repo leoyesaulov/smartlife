@@ -15,9 +15,9 @@ sunrise = sun(city.observer)["sunrise"]
 now = datetime.datetime.now().astimezone()
 
 def check():
-    if now >= sunset - datetime.timedelta(minutes=30):
+    if now >= sunset - datetime.timedelta(minutes=30) and strip.brightness == 0:
         print("Turning lights on at: " + now.strftime("%d.%b.%Y %H:%M:%S"))
         strip.on = 25
-    if now <= sunrise + datetime.timedelta(minutes=30):
+    if now <= sunrise + datetime.timedelta(minutes=30) and strip.brightness > 0:
         print("Turning lights off at: " + now.strftime("%d.%b.%Y %H:%M:%S"))
         strip.on = 0
