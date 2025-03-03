@@ -1,9 +1,13 @@
-from pycololight import PyCololight
-from dotenv import load_dotenv
-import os
+import asyncio
+from asyncio import sleep
+from datetime import datetime
 
-load_dotenv()
+import light_switch
 
-strip = PyCololight(device="strip", host=os.getenv("STRIP_IP"), dynamic_effects=True)
+async def run():
+    while True:
+        light_switch.check()
+        print("I ran on: " + datetime.now().strftime("%d.%b.%Y %H:%M:%S"))
+        await sleep(600)
 
-strip.on = 25
+asyncio.run(run())
