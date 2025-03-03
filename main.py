@@ -7,7 +7,7 @@ import light_switch
 async def run():
     while True:
         light_switch.check()
-        print("I ran on: " + datetime.now().strftime("%d.%b.%Y %H:%M:%S"))
+        print("I ran at: " + datetime.now().strftime("%d.%b.%Y %H:%M:%S"))
         await sleep(600)
 
 asyncio.run(run())
