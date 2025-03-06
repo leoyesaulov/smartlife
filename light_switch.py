@@ -17,7 +17,7 @@ def check():
     sunset = sun(city.observer)["sunset"].astimezone(munich)
     sunrise = sun(city.observer)["sunrise"].astimezone(munich)
     now = datetime.datetime.now().astimezone(munich)
-    strip.state()
+    strip.state
 
     if now >= sunset - datetime.timedelta(minutes=30) and not strip.on:
         print("Turning lights on with previous brightness: ", strip.brightness, " at: " + now.astimezone().strftime("%d.%b.%Y %H:%M:%S"))
