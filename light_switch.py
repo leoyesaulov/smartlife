@@ -20,10 +20,10 @@ def check():
 
     if now >= sunset - datetime.timedelta(minutes=30) and not strip.on:
         print("Turning lights on with previous brightness: ", strip.brightness, " at: " + now.astimezone().strftime("%d.%b.%Y %H:%M:%S"))
-        strip.on = 25
+        on()
     if (now.hour >= 23 or (0 <= now.hour <= 8)) and now.minute < 11 and strip.on:
         print("Turning lights off at: " + now.strftime("%d.%b.%Y %H:%M:%S"))
-        strip.on = 0
+        off()
 
 def on(brightness=25):
     strip.on = brightness
