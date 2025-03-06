@@ -24,3 +24,9 @@ def check():
     if now.day != (now + datetime.timedelta(minutes=30)).day and strip.on:
         print("Turning lights off at: " + now.strftime("%d.%b.%Y %H:%M:%S"))
         strip.on = 0
+
+def on(brightness=25):
+    strip.on = brightness
+
+def off():
+    strip.on = 0
