@@ -15,9 +15,10 @@ async def listen_to_input():
     loop = asyncio.get_event_loop()
     while True:
         user_input = await loop.run_in_executor(None, input, "")
-        match user_input.lower():
+        input_arr = user_input.lower().split()
+        match input_arr[0]:
             case "on":
-                light_switch.on()
+                light_switch.on(int(input_arr[1]) if len(input_arr) > 1 else 25)
             case "off":
                 light_switch.off()
 
