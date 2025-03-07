@@ -18,10 +18,10 @@ def check():
     now = datetime.datetime.now().astimezone(munich)
     strip.state
 
-    if now >= sunset - datetime.timedelta(minutes=30) and not strip.on:
+    if now >= sunset - datetime.timedelta(minutes=30) and not strip.on and not now.hour == 23:
         print("Turning lights on with previous brightness: ", strip.brightness, " at: " + now.astimezone().strftime("%d.%b.%Y %H:%M:%S"))
         on()
-    if (now.hour >= 23 or (0 <= now.hour <= 8)) and now.minute < 11 and strip.on:
+    if (now.hour >= 23 or (0 <= now.hour <= 8)) and now.minute % 30 == 0 and strip.on:
         print("Turning lights off at: " + now.strftime("%d.%b.%Y %H:%M:%S"))
         off()
 
