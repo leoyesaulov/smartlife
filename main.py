@@ -29,22 +29,16 @@ async def listen_to_input():
                         light_switch.on(int(input_arr[1]))
                     case 3:
                         light_switch.on(int(input_arr[1]))
-                        event.clear()
-                        await sleep(int(input_arr[2])*60)
-                        event.set()
+                        asyncio.create_task(wait(int(input_arr[1]) * 60))
             case "off":
                 match len(input_arr):
                     case 1:
                         light_switch.off()
                     case 2:
                         light_switch.off()
-                        event.clear()
-                        await sleep(int(input_arr[1]) * 60)
-                        event.set()
+                        asyncio.create_task(wait(int(input_arr[1]) * 60))
             case "timer":
-                event.clear()
-                await sleep(int(input_arr[1]) * 60)
-                event.set()
+                asyncio.create_task(wait(int(input_arr[1]) * 60))
 
 async def wait(seconds):
     enter()
