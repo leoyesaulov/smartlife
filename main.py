@@ -7,6 +7,7 @@ import light_switch
 event = asyncio.Event()
 semaphore = 0
 lock = asyncio.Lock()
+extra_tasks = []
 
 async def run():
     while True:
@@ -29,35 +30,47 @@ async def listen_to_input():
                         light_switch.on(int(input_arr[1]))
                     case 3:
                         light_switch.on(int(input_arr[1]))
-                        asyncio.create_task(wait(int(input_arr[1]) * 60))
+                        print("waiting", input_arr[2])
+                        extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
             case "off":
                 match len(input_arr):
                     case 1:
                         light_switch.off()
                     case 2:
                         light_switch.off()
-                        asyncio.create_task(wait(int(input_arr[1]) * 60))
+                        extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
             case "timer":
-                asyncio.create_task(wait(int(input_arr[1]) * 60))
+                extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
+            case "stop":
+                await kill()
+
 
 async def wait(seconds):
-    enter()
+    await enter()
     await asyncio.sleep(seconds)
-    release()
+    await release()
 
-def enter():
+async def enter():
     global semaphore
     async with lock:
         semaphore += 1
     event.clear()
 
-def release():
+async def release():
     global semaphore
     async with lock:
         semaphore -= 1
         if semaphore <= 0:
             event.set()
 
+async def kill():
+    global extra_tasks
+    global semaphore
+    async with lock:
+        for task in extra_tasks:
+            task.cancel()
+        semaphore = 0
+        event.set()
 
 async def main():
     event.set()
