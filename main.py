@@ -30,8 +30,9 @@ async def listen_to_input():
                         light_switch.on(int(input_arr[1]))
                     case 3:
                         light_switch.on(int(input_arr[1]))
-                        print("waiting", input_arr[2])
+                        print("waiting", input_arr[2], "minutes, starting at", datetime.now().strftime("%H:%M:%S"))
                         extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
+
             case "off":
                 match len(input_arr):
                     case 1:
@@ -48,6 +49,7 @@ async def listen_to_input():
 async def wait(seconds):
     await enter()
     await asyncio.sleep(seconds)
+    print("wait complete at", datetime.now().strftime("%H:%M:%S"))
     await release()
 
 async def enter():
