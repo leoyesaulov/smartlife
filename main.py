@@ -44,6 +44,8 @@ async def listen_to_input():
                 extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
             case "stop":
                 await kill()
+            case _:
+                print("I'm sorry, I didn't understand that.")
 
 
 async def wait(seconds):
