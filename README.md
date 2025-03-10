@@ -2,6 +2,7 @@
 This project's goal is to automatisate my smarthome appliances.
 
 Current functionality:
+- Checks every 10 minutes if one of below actions needed:
 - Turn the lights on/off depending on sun position (turn on right before sunset) and time (turn off after 23:00)
 - Turn the lights on/off manually
 - Try to turn lights off every 30 minutes after 23:00 (this activity can be paused with "timer x" command, where x = minutes)
