@@ -16,37 +16,62 @@ async def run():
         light_switch.check()
         logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
+        
+def parse(arr):
+  out = {
+    mode: arr[0],
+    amount: arr[1] == 0 ? arr[0] == 'on' ? 25 : 0 : arr[1],
+    timer: arr[2]
+  }
+  return out
 
 async def listen_to_input():
     loop = asyncio.get_event_loop()
     while True:
         user_input = await loop.run_in_executor(None, input, "")
         input_arr = user_input.lower().split()
-        match input_arr[0]:
-            case "on":
-                match len(input_arr):
-                    case 1:
-                        light_switch.on()
-                    case 2:
-                        light_switch.on(int(input_arr[1]))
-                    case 3:
-                        light_switch.on(int(input_arr[1]))
-                        logger.logInfo(f"Timer of {input_arr[2]} minutes has been set.")
-                        extra_tasks.append(asyncio.create_task(wait(int(input_arr[2]) * 60)))
 
-            case "off":
-                match len(input_arr):
-                    case 1:
-                        light_switch.off()
-                    case 2:
-                        light_switch.off()
-                        extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
-            case "timer":
-                extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
-            case "stop":
-                await kill()
-            case _:
-                print("I'm sorry, I didn't understand that.")
+        # padding the list
+        input_arr = input_arr + [0]*(3-len(input_arr))
+        
+        input_dict = parse(input_arr)    
+        
+        mode = input_dict['mode']
+        amount = input_dict['amount']
+        timer = input_dict['timer']
+      
+        if mode == "on":
+            light_switch.on(int(amount))
+            
+            if timer:
+                logger.logInfo(f"Timer of {timer} minutes has been set.")
+                extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
+            
+            continue
+
+        if mode == "off":
+            light_switch.off()
+            
+            if timer:
+                logger.logInfo(f"Timer of {timer} minutes has been set.")
+                extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
+            continue
+
+        if mode == "timer":
+            logger.logInfo(f"Timer of {timer} minutes has been set.")
+            extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
+            continue
+
+
+        if input_arr[0] == "stop":
+            await kill()
+            logger.logInfo("All timers have been killed.")
+            continue
+        
+        # if no if block hit
+        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer','stop'. Got '{input_arr[0]}'.")
+                
+
 
 
 async def wait(seconds):
