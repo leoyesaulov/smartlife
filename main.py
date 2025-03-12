@@ -1,4 +1,5 @@
 import asyncio
+import logger
 from asyncio import sleep
 from datetime import datetime
 import light_switch
@@ -13,8 +14,16 @@ async def run():
     while True:
         await event.wait()
         light_switch.check()
-        print("I ran at: " + datetime.now().strftime("%d.%b.%Y %H:%M:%S"))
+        logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
+        
+def parse(arr):
+  out = {
+    mode: arr[0],
+    amount: arr[1] == 0 ? arr[0] == 'on' ? 25 : 0 : arr[1],
+    timer: arr[2]
+  }
+  return out
 
 async def listen_to_input():
     loop = asyncio.get_event_loop()
@@ -24,28 +33,39 @@ async def listen_to_input():
 
         # padding the list
         input_arr = input_arr + [0]*(3-len(input_arr))
-
-        if input_arr[0] == "on":
-            light_switch.on(int(input_arr[1]))
+        
+        input_dict = parse(input_arr)    
+        
+        mode = input_dict['mode']
+        amount = input_dict['amount']
+        timer = input_dict['timer']
+      
+        if mode == "on":
+            light_switch.on(int(amount))
             
-            if input_arr[2]:
-                print(f"waiting {input_arr[2]} minutes, starting at {datetime.now().strftime('%H:%M:%S')}")
+            if timer:
+                logger.logInfo(f"Timer of {timer} minutes has been set.")
+                extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
             
-            extra_tasks.append(asyncio.create_task(wait(int(input_arr[2]) * 60)))
             continue
 
-        if input_arr[0] == "off":
+        if mode == "off":
             light_switch.off()
-            extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
+            
+            if timer:
+                logger.logInfo(f"Timer of {timer} minutes has been set.")
+                extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
             continue
 
-        if input_arr[0] == "timer":
-            extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
+        if mode == "timer":
+            logger.logInfo(f"Timer of {timer} minutes has been set.")
+            extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
             continue
 
 
         if input_arr[0] == "stop":
             await kill()
+            logger.logInfo("All timers have been killed.")
             continue
         
         # if no if block hit
@@ -53,10 +73,11 @@ async def listen_to_input():
                 
 
 
+
 async def wait(seconds):
     await enter()
     await asyncio.sleep(seconds)
-    print(f"wait complete at {datetime.now().strftime("%H:%M:%S")}")
+    logger.logInfo(f"Wait complete." )
     await release()
 
 async def enter():
@@ -86,4 +107,9 @@ async def main():
     await asyncio.gather(run(), listen_to_input())
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logger.logCritical(f"Critical error: {e=}" )
+    finally:
+        logger.logFatal("Terminating...")

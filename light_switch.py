@@ -1,5 +1,6 @@
 import os
 import datetime
+import logger
 from astral.sun import sun
 from astral import LocationInfo
 from dotenv import load_dotenv
@@ -18,14 +19,15 @@ def check():
     strip.state # the statement has no effect?
 
     if now >= sunset - datetime.timedelta(minutes=30) and not all([strip.on, now.hour == 23]):
-        print(f"Turning lights on with previous brightness ({strip.brightness}) at {now.astimezone().strftime("%d.%b.%Y %H:%M:%S")}")
         on()
     if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute/10) % 3 == 0 and strip.on:
-        print(f"Turning lights off at {now.strftime("%d.%b.%Y %H:%M:%S")}")
         off()
 
 def on(brightness=25):
+    strip.state
+    logger.logInfo(f"Turning lights on with previous brightness: {strip.brightness}.")
     strip.on = brightness
 
 def off():
+    logger.logInfo(f"Turning lights off.")
     strip.on = 0
