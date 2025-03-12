@@ -1,4 +1,5 @@
 import asyncio
+import logger
 from asyncio import sleep
 from datetime import datetime
 import light_switch
@@ -13,7 +14,7 @@ async def run():
     while True:
         await event.wait()
         light_switch.check()
-        print("I ran at: " + datetime.now().strftime("%d.%b.%Y %H:%M:%S"))
+        logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
 
 async def listen_to_input():
@@ -30,7 +31,7 @@ async def listen_to_input():
                         light_switch.on(int(input_arr[1]))
                     case 3:
                         light_switch.on(int(input_arr[1]))
-                        print("waiting", input_arr[2], "minutes, starting at", datetime.now().strftime("%H:%M:%S"))
+                        logger.logInfo(f"Timer of {input_arr[2]} minutes has been set.")
                         extra_tasks.append(asyncio.create_task(wait(int(input_arr[2]) * 60)))
 
             case "off":
@@ -51,7 +52,7 @@ async def listen_to_input():
 async def wait(seconds):
     await enter()
     await asyncio.sleep(seconds)
-    print("wait complete at", datetime.now().strftime("%H:%M:%S"))
+    logger.logInfo(f"Wait complete." )
     await release()
 
 async def enter():
@@ -80,4 +81,10 @@ async def main():
     event.set()
     await asyncio.gather(run(), listen_to_input())
 
-asyncio.run(main())
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logger.logCritical(f"Critical error: {e=}" )
+    finally:
+        logger.logFatal("Terminating...")

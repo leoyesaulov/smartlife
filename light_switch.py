@@ -1,5 +1,6 @@
 import os
 import datetime
+import logger
 from astral.sun import sun
 from astral import LocationInfo
 from dotenv import load_dotenv
@@ -16,17 +17,18 @@ munich = datetime.timezone(datetime.timedelta(hours=+1))
 def check():
     sunset = sun(city.observer)["sunset"].astimezone(munich)
     now = datetime.datetime.now().astimezone(munich)
-    strip.state
 
     if now >= sunset - datetime.timedelta(minutes=30) and not strip.on and not now.hour == 23:
-        print("Turning lights on with previous brightness: ", strip.brightness, " at: " + now.astimezone().strftime("%d.%b.%Y %H:%M:%S"))
         on()
     if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute/10) % 3 == 0 and strip.on:
-        print("Turning lights off at: " + now.strftime("%d.%b.%Y %H:%M:%S"))
+
         off()
 
 def on(brightness=25):
+    strip.state
+    logger.logInfo(f"Turning lights on with previous brightness: {strip.brightness}.")
     strip.on = brightness
 
 def off():
+    logger.logInfo(f"Turning lights off.")
     strip.on = 0
