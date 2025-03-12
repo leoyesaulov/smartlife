@@ -18,12 +18,12 @@ async def run():
         await sleep(600)
         
 def parse(arr):
-  out = {
-    mode: arr[0],
-    amount: arr[1] == 0 ? arr[0] == 'on' ? 25 : 0 : arr[1],
-    timer: arr[2]
-  }
-  return out
+    out = {
+        "mode": arr[0],
+        "amount": 25 if arr[0] == 'on' and arr[1] == 0 else arr[1],
+        "timer": arr[2]
+    }
+    return out
 
 async def listen_to_input():
     loop = asyncio.get_event_loop()
