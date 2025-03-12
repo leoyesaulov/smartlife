@@ -32,12 +32,12 @@ async def listen_to_input():
                 print(f"waiting {input_arr[2]} minutes, starting at {datetime.now().strftime('%H:%M:%S')}")
             
             extra_tasks.append(asyncio.create_task(wait(int(input_arr[2]) * 60)))
-
+            continue
 
         if input_arr[0] == "off":
             light_switch.off()
             extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
-
+            continue
 
         if input_arr[0] == "timer":
             extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
@@ -46,7 +46,8 @@ async def listen_to_input():
 
         if input_arr[0] == "stop":
             await kill()
-
+            continue
+        
         # if no if block hit
         print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer','stop'. Got '{input_arr[0]}'.")
                 
