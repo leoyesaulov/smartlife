@@ -21,37 +21,41 @@ async def listen_to_input():
     while True:
         user_input = await loop.run_in_executor(None, input, "")
         input_arr = user_input.lower().split()
-        match input_arr[0]:
-            case "on":
-                match len(input_arr):
-                    case 1:
-                        light_switch.on()
-                    case 2:
-                        light_switch.on(int(input_arr[1]))
-                    case 3:
-                        light_switch.on(int(input_arr[1]))
-                        print("waiting", input_arr[2], "minutes, starting at", datetime.now().strftime("%H:%M:%S"))
-                        extra_tasks.append(asyncio.create_task(wait(int(input_arr[2]) * 60)))
 
-            case "off":
-                match len(input_arr):
-                    case 1:
-                        light_switch.off()
-                    case 2:
-                        light_switch.off()
-                        extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
-            case "timer":
-                extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
-            case "stop":
-                await kill()
-            case _:
-                print("I'm sorry, I didn't understand that.")
+        # padding the list
+        input_arr = input_arr + [0]*(3-len(input_arr))
+
+        if input_arr[0] == "on":
+            light_switch.on(int(input_arr[1]))
+            
+            if input_arr[2]:
+                print(f"waiting {input_arr[2]} minutes, starting at {datetime.now().strftime('%H:%M:%S')}")
+            
+            extra_tasks.append(asyncio.create_task(wait(int(input_arr[2]) * 60)))
+
+
+        if input_arr[0] == "off":
+            light_switch.off()
+            extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
+
+
+        if input_arr[0] == "timer":
+            extra_tasks.append(asyncio.create_task(wait(int(input_arr[1]) * 60)))
+            continue
+
+
+        if input_arr[0] == "stop":
+            await kill()
+
+        # if no if block hit
+        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer','stop'. Got '{input_arr[0]}'.")
+                
 
 
 async def wait(seconds):
     await enter()
     await asyncio.sleep(seconds)
-    print("wait complete at", datetime.now().strftime("%H:%M:%S"))
+    print(f"wait complete at {datetime.now().strftime("%H:%M:%S")}")
     await release()
 
 async def enter():
@@ -80,4 +84,5 @@ async def main():
     event.set()
     await asyncio.gather(run(), listen_to_input())
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
