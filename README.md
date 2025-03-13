@@ -19,7 +19,7 @@ Available inputs:
 
 Controlled device(s):
 ---
-- [Cololight Strip](https://cololight.de/products/cololight-strip?variant=32881788387392) (props to [pycololight](https://github.com/BazaJayGee66/pycololight) for reverse-engineering the API for these strips)
+- [Cololight Strip](https://cololight.de/products/cololight-strip?variant=32881788387392) (props to [pycololight](https://github.com/BazaJayGee66/pycololight) for reverse-engineering their API)
 
 Usage (makefile coming soon):
 ---
