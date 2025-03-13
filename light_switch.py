@@ -1,38 +1,44 @@
-import datetime
 import logger
 from astral.sun import sun
-from astral import LocationInfo, Observer
 from dotenv import load_dotenv
 from pycololight import PyCololight
-from geopy.geocoders import Nominatim
+
+# related to ID'ing the location
 from typing import Dict, Union
+from geopy.geocoders import GeoNames
+from astral import LocationInfo, Observer
+from datetime import datetime, timezone, timedelta
 
 
-def get_user_location(agent: str = "smartlife") -> Dict[str, Union[Observer, datetime.timezone]]:
+def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
     """
     Prompts the user to enter their location until a valid input is given.
     Returns a dictionary with:
         observer: astral.Observer\n
         timezone: datetime.timezone
     """
-    loc = {}
+    loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
+
     while True:
-        usr_input = input("Please provide an (approximate) location of the strip: ")
+        usr_input = input("Please provide the city your strip is located in: ")
         if not usr_input: continue
 
-        try:
-            # convert location to (among others) latitude and longitude
-            user_code = Nominatim(user_agent=agent).geocode(usr_input)
-            observer = LocationInfo(latitude=user_code.latitude, longitude=user_code.longitude).observer
+        res = GeoNames(username).geocode(usr_input)
+        if res: break
 
-            loc.update({"observer": observer})
-            loc.update({"timezone": datetime.timezone(observer.utcoffset(dt=None))})
+        print(f"City '{usr_input}' could not be found, try a different one.")
 
-            # not sure about Nominatim's behaviour
-            assert all(loc.values()), "Error has occurred while filling the location dictionary: the dict is empty"
-            return loc
-        except Exception as err:
-            print(f"An error occurred while parsing user's input: {err}")
+    coordinates = res.point
+    gmt_offset = GeoNames(username).reverse_timezone(coordinates).raw["gmtOffset"]
+    tz = timezone(timedelta(hours=gmt_offset))
+    loc.update({"timezone": tz})
+
+    # needed further down the line
+    observer = LocationInfo(latitude=coordinates.latitude, longitude=coordinates.longitude).observer
+    loc.update({"observer": observer})
+
+    assert all(loc.values()), "Error has occurred while filling the location dictionary: the dict is empty"
+    return loc
 
 
 class LightStrip:
@@ -47,10 +53,10 @@ class LightStrip:
 
     def check(self):
         sunset = sun(self.city)["sunset"].astimezone(self.city_tz)
-        now = datetime.datetime.now().astimezone(self.city_tz)
+        now = datetime.now().astimezone(self.city_tz)
         self.strip.state
 
-        if now >= sunset - datetime.timedelta(minutes=30) and not all([self.strip.on, now.hour == 23]):
+        if now >= sunset - timedelta(minutes=30) and not all([self.strip.on, now.hour == 23]):
             self.on()
         if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute / 10) % 3 == 0 and self.strip.on:
             self.off()
