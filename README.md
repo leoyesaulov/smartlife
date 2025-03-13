@@ -26,7 +26,7 @@ Usage (makefile coming soon):
 ### Windows:
 - Pull the repo
 - Create `.env` in your root directory
-- Place your strip's IP in `.env` as follows: `STRIP_IP="your_ip"`
+- Place your strip's IP and your city's data (name, country, timezone, latitude and longitude) in `.env` as follows: `STRIP_IP="your_ip", CITY="your_city", COUNTRY="your_country", TIMEZONE="your_timezone", LATITUDE=your_latitude(float format), LONGITUDE=your_longitude(float format)`
 - Create a new virtual environment inside of the project's folder with: `python -m venv .venv`
 - Activate the virtual environment:
   -  For `cmd.exe` shell: `C:\> <path-to-.venv>\Scripts\activate.bat`
