@@ -1,30 +1,39 @@
-# smartlife
+# Smartlife
 This project's goal is to automatisate my smarthome appliances.
 
 Current functionality:
-- Checks every 10 minutes if one of below actions needed:
-- Turn the lights on/off depending on sun position (turn on right before sunset) and time (turn off after 23:00)
-- Turn the lights on/off manually
-- Try to turn lights off every 30 minutes after 23:00 (this activity can be paused with "timer x" command, where x = minutes)
+---
+- Turns the lights on/off depending on sun position (turn on right before sunset) and time (turn off after 23:00 local time)
+- Lets turn the lights on/off manually
+- Tries to turn lights off every 30 minutes after 23:00 local time (this activity can be paused with `timer`)
 
 Available inputs:
-- on: turns on the lights with 25 brightness
-- on x: turns on the lights with x brightness
-- on x y: turns on the lights with x brightness and sets the timer for y minutes
-- off: turns off the lights
-- off x: turns off the lights and sets timer for x minutes
-- timer x: sets the timer for x minutes (disables the automated turn on/off for the duration of the timer)
-- stop: kills all timers
-- anything else: prints "I'm sorry, I didn't understand that."
+---
+`on <brightness=25> <time=0>` - Turns the lights on with `brightness` with `time` minutes delay.
 
-Controlled devices:
-- Cololight Strip (thx to pycololight for reverse-engineering the api for these strips)
+`off <time=0>` - Turns the lights off with `time` minutes delay.
 
-Usage (makefile soon):
+`timer <time>` - Sets the timer for `time` minutes (disables the automatic turning on/off for the duration of the timer)
+
+`stop` - Kills all timers
+
+Controlled device(s):
+---
+- [Cololight Strip](https://cololight.de/products/cololight-strip?variant=32881788387392) (props to [pycololight](https://github.com/BazaJayGee66/pycololight) for reverse-engineering the API for these strips)
+
+Usage (makefile coming soon):
+---
+### Windows:
 - Pull the repo
-- Create .env in root directory
-- Place your strip's IP in .env in form of: STRIP_IP="your_ip"
-- Create and enter venv
-- Install requirements (run command "pip install -r requirements.txt")
-- run main.py
+- Create `.env` in your root directory
+- Place your strip's IP in `.env` as follows: `STRIP_IP="your_ip"`
+- Create a new virtual environment inside of the project's folder with: `python -m venv .venv`
+- Activate the virtual environment:
+  -  For `cmd.exe` shell: `C:\> <path-to-.venv>\Scripts\activate.bat`
+  -  For `Powershell`: `C:\> <path-to-.venv>\Scripts\Activate.ps1`
+- Install the requirements by running: `pip install -r requirements.txt`
+- run `main.py` with `python main.py`
 - Profit!
+
+### Unix-like:
+- Coming soon!
