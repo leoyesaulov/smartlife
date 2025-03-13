@@ -1,7 +1,10 @@
 import asyncio
+import os
+import sys
+
+from dotenv import load_dotenv
 import logger
 from asyncio import sleep
-from datetime import datetime
 import light_switch
 
 
@@ -9,11 +12,13 @@ event = asyncio.Event()
 semaphore = 0
 lock = asyncio.Lock()
 extra_tasks = []
+load_dotenv()
+cololight_strip = light_switch.LightStrip(ip=os.getenv("STRIP_IP"))
 
 async def run():
     while True:
         await event.wait()
-        light_switch.check()
+        cololight_strip.check()
         logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
         
@@ -41,7 +46,7 @@ async def listen_to_input():
         timer = input_dict['timer']
       
         if mode == "on":
-            light_switch.on(int(amount))
+            cololight_strip.on(int(amount))
             
             if timer:
                 logger.logInfo(f"Timer of {timer} minutes has been set.")
@@ -50,7 +55,7 @@ async def listen_to_input():
             continue
 
         if mode == "off":
-            light_switch.off()
+            cololight_strip.off()
             
             if timer:
                 logger.logInfo(f"Timer of {timer} minutes has been set.")
@@ -63,15 +68,16 @@ async def listen_to_input():
             continue
 
 
-        if input_arr[0] == "stop":
+        if mode == "stop":
             await kill()
             logger.logInfo("All timers have been killed.")
             continue
+
+        if mode == "exit":
+            sys.exit(0)
         
         # if no if block hit
         print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer','stop'. Got '{input_arr[0]}'.")
-                
-
 
 
 async def wait(seconds):
@@ -108,8 +114,10 @@ async def main():
 
 if __name__ == "__main__":
     try:
+        logger.logInfo("Starting the application.")
         asyncio.run(main())
     except Exception as e:
         logger.logCritical(f"Critical error: {e=}" )
     finally:
         logger.logFatal("Terminating...")
+        logger.logEmpty()

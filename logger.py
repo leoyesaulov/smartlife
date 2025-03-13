@@ -1,28 +1,54 @@
 import logging
+from logging import FileHandler
 
-logging.basicConfig(
-    format='%(name)s.%(levelname)s at %(asctime)s: %(message)s',
-    datefmt='%d.%m.%Y %H:%M:%S',
+base_logger = logging.getLogger("base")
+empty_logger = logging.getLogger("empty")
+
+base_handler = FileHandler(
     filename='.log',
+    mode='a',
     encoding='utf-8',
-    filemode='a',
-    level=logging.INFO
+)
+empty_handler = FileHandler(
+    filename='.log',
+    mode='a',
+)
+base_handler.setLevel(logging.DEBUG)
+empty_handler.setLevel(logging.DEBUG)
+
+fmt = logging.Formatter(
+    fmt='%(name)s.%(levelname)s at %(asctime)s: %(message)s',
+    datefmt='%d.%m.%Y %H:%M:%S',
+)
+empty = logging.Formatter(
+    fmt=''
 )
 
+base_handler.setFormatter(fmt)
+empty_handler.setFormatter(empty)
+
+base_logger.addHandler(base_handler)
+empty_logger.addHandler(empty_handler)
+base_logger.setLevel(logging.DEBUG)
+empty_logger.setLevel(logging.DEBUG)
+
 def logInfo(message):
-    logging.info(message)
+    base_logger.info(message)
 
 def logWarning(message):
-    logging.warning(message)
+    base_logger.warning(message)
 
 def logError(message):
-    logging.error(message)
+    base_logger.error(message)
 
 def logCritical(message):
-    logging.critical(message)
+    base_logger.critical(message)
 
 def logDebug(message):
-    logging.debug(message)
+    base_logger.debug(message)
 
 def logFatal(message):
-    logging.fatal(message)
+    base_logger.fatal(message)
+
+def logEmpty():
+    empty_logger.info("")

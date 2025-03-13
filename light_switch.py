@@ -7,27 +7,30 @@ from dotenv import load_dotenv
 from pycololight import PyCololight
 
 
-load_dotenv()
-strip = PyCololight(device="strip", host=os.getenv("STRIP_IP"), dynamic_effects=True)
-city = LocationInfo(os.getenv("CITY"), os.getenv("COUNTRY"), os.getenv("TIMEZONE"), float(os.getenv("LATITUDE")), float(os.getenv("LONGITUDE")))
-city_tz = datetime.timezone(datetime.timedelta(hours=+1)) # Change to "tz" for porability purposes?
+class LightStrip:
+    def __init__(self, ip, device='cololight'):
+        load_dotenv()
+        self.city = LocationInfo(os.getenv("CITY"), os.getenv("COUNTRY"), os.getenv("TIMEZONE"), float(os.getenv("LATITUDE")), float(os.getenv("LONGITUDE")))
+        self.city_tz = datetime.timezone(datetime.timedelta(hours=+1))
+        match device:
+            case "cololight":
+                self.strip = PyCololight(device="strip", host=ip, dynamic_effects=True)
 
+    def check(self):
+        sunset = sun(self.city.observer)["sunset"].astimezone(self.city_tz)
+        now = datetime.datetime.now().astimezone(self.city_tz)
+        self.strip.state
 
-def check():
-    sunset = sun(city.observer)["sunset"].astimezone(city_tz)
-    now = datetime.datetime.now().astimezone(city_tz)
-    strip.state # the statement has no effect?
+        if now >= sunset - datetime.timedelta(minutes=30) and not all([self.strip.on, now.hour == 23]):
+            self.on()
+        if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute/10) % 3 == 0 and self.strip.on:
+            self.off()
 
-    if now >= sunset - datetime.timedelta(minutes=30) and not all([strip.on, now.hour == 23]):
-        on()
-    if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute/10) % 3 == 0 and strip.on:
-        off()
+    def on(self, brightness=25):
+        self.strip.state
+        logger.logInfo(f"Turning lights on with previous brightness: {self.strip.brightness}.")
+        self.strip.on = brightness
 
-def on(brightness=25):
-    strip.state
-    logger.logInfo(f"Turning lights on with previous brightness: {strip.brightness}.")
-    strip.on = brightness
-
-def off():
-    logger.logInfo(f"Turning lights off.")
-    strip.on = 0
+    def off(self):
+        logger.logInfo(f"Turning lights off.")
+        self.strip.on = 0
