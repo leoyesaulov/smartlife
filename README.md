@@ -9,9 +9,9 @@ Current functionality:
 
 Available inputs:
 ---
-`on <brightness=25> <time=0>` - Turns the lights on with `brightness` with `time` minutes delay.
+`on <brightness=25> <time=0>` - Turns the lights on with `brightness` and starts the `timer` of `time` minutes.
 
-`off <time=0>` - Turns the lights off with `time` minutes delay.
+`off <time=0>` - Turns the lights off and starts the `timer` of `time` minutes.
 
 `timer <time>` - Sets the timer for `time` minutes (disables the automatic turning on/off for the duration of the timer)
 
@@ -19,7 +19,7 @@ Available inputs:
 
 Controlled device(s):
 ---
-- [Cololight Strip](https://cololight.de/products/cololight-strip?variant=32881788387392) (props to [pycololight](https://github.com/BazaJayGee66/pycololight) for reverse-engineering the API for these strips)
+- [Cololight Strip](https://cololight.de/products/cololight-strip?variant=32881788387392) (props to [pycololight](https://github.com/BazaJayGee66/pycololight) for reverse-engineering their API)
 
 Usage (makefile coming soon):
 ---
