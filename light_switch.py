@@ -56,7 +56,8 @@ class LightStrip:
         now = datetime.now().astimezone(self.city_tz)
         self.strip.state
 
-        if now >= sunset - timedelta(minutes=30) and not all([self.strip.on, now.hour == 23]):
+
+        if now >= sunset - datetime.timedelta(minutes=30) and not any([self.strip.on, now.hour == 23]):
             self.on()
         if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute / 10) % 3 == 0 and self.strip.on:
             self.off()
