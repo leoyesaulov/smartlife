@@ -10,7 +10,7 @@ from astral import LocationInfo, Observer
 from datetime import datetime, timezone, timedelta
 
 
-def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
+def _get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
     """
     Prompts the user to enter their location until a valid input is given.
     Returns a dictionary with:
@@ -44,7 +44,7 @@ def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, 
 class LightStrip:
     def __init__(self, ip, device='cololight'):
         load_dotenv()
-        user_loc = get_user_location()
+        user_loc = _get_user_location()
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
         match device:
