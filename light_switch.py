@@ -11,7 +11,7 @@ from astral import LocationInfo, Observer
 from datetime import datetime, timezone, timedelta
 
 
-def ask_for_input(username: str = "smartlife"):
+def _ask_for_input(username: str = "smartlife"):
     """
     Helper function that pulls environment and/or prompts the user for input
     :param username:
@@ -46,7 +46,7 @@ def ask_for_input(username: str = "smartlife"):
     return res
 
 
-def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
+def _get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
     """
     Loads from environment or prompts the user to enter their location until a valid input is given.
     Returns a dictionary with:
@@ -55,7 +55,7 @@ def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, 
     """
     loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
 
-    res = ask_for_input(username)
+    res = _ask_for_input(username)
 
     coordinates = res.point
     gmt_offset = GeoNames(username).reverse_timezone(coordinates).raw["gmtOffset"]
@@ -73,7 +73,7 @@ def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, 
 class LightStrip:
     def __init__(self, ip, device='cololight'):
         load_dotenv()
-        user_loc = get_user_location()
+        user_loc = _get_user_location()
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
         match device:
