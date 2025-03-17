@@ -17,7 +17,7 @@ async def run():
 def parse(arr):
     out = {
         "command": arr[0],
-        "param1": 25 if arr[0] == 'on' and arr[1] == 0 else arr[1],
+        "param1": '25' if arr[0] == 'on' and arr[1] == 0 else arr[1],
         "param2": arr[2]
     }
     return out
@@ -74,7 +74,7 @@ async def listen_to_input():
             else:
                 print("Current city has been updated.")
                 logger.logInfo(f"Current city has been updated.")
-                cololight_strip.on(param1)
+                cololight_strip.change_location(param1)
             continue
 
         if command == "exit":
