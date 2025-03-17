@@ -11,14 +11,20 @@ from astral import LocationInfo, Observer
 from datetime import datetime, timezone, timedelta
 
 
+def _update_env(key: str, value: str):
+    dotenv_file = find_dotenv()
+    load_dotenv(dotenv_file)
+    set_key(dotenv_file, key, value)
+
+def _get_dict(string: str, username: str = "smartlife"):
+    return GeoNames(username).geocode(string)
+
 def _ask_for_input(username: str = "smartlife"):
     """
     Helper function that pulls environment and/or prompts the user for input
     :param username:
     :return: res of .geocode()
     """
-    dotenv_file = find_dotenv()
-    load_dotenv(dotenv_file)
     while True:
         city = os.environ.get("CITY")
         if not city:
@@ -28,7 +34,7 @@ def _ask_for_input(username: str = "smartlife"):
 
             res = GeoNames(username).geocode(user_input)
             if res:
-                set_key(dotenv_file, "CITY", user_input)
+                _update_env("CITY", user_input)
                 break
 
             print(f"City '{user_input}' could not be found, try a different one.")
@@ -36,7 +42,7 @@ def _ask_for_input(username: str = "smartlife"):
         else:
             res = GeoNames(username).geocode(city)
             if not res:
-                set_key(dotenv_file, "CITY", "")
+                _update_env("CITY", "")
                 print(f"City '{city}' was pulled from environment and could not be found, try a different one.")
                 continue
             else:
@@ -45,17 +51,8 @@ def _ask_for_input(username: str = "smartlife"):
 
     return res
 
-
-def _get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
-    """
-    Loads from environment or prompts the user to enter their location until a valid input is given.
-    Returns a dictionary with:
-        observer: astral.Observer\n
-        timezone: datetime.timezone
-    """
+def _res_to_loc(res, username: str = "smartlife"):
     loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
-
-    res = _ask_for_input(username)
 
     coordinates = res.point
     gmt_offset = GeoNames(username).reverse_timezone(coordinates).raw["gmtOffset"]
@@ -70,6 +67,18 @@ def _get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer,
     return loc
 
 
+def _get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
+    """
+    Loads from environment or prompts the user to enter their location until a valid input is given.
+    Returns a dictionary with:
+        observer: astral.Observer\n
+        timezone: datetime.timezone
+    """
+
+    res = _ask_for_input(username)
+    return _res_to_loc(res, username)
+
+
 class LightStrip:
     def __init__(self, ip, device='cololight'):
         load_dotenv()
@@ -81,7 +90,14 @@ class LightStrip:
                 self.strip = PyCololight(device="strip", host=ip, dynamic_effects=True)
 
     def change_location(self, city: str):
-        self.city = city # PLACEHOLDER
+        res = _ask_for_input(city)
+        if not res:
+            print(f"I was unable to find city '{city}'. Try again.")
+            return
+        _update_env("CITY", city)
+        loc = _res_to_loc(res)                                                      # ToDo: usernames not supported here, fix when multi-devicing
+        self.city = loc["observer"]
+        self.city_tz = loc["timezone"]
 
     def check(self):
         sunset = sun(self.city)["sunset"].astimezone(self.city_tz)
