@@ -1,7 +1,8 @@
+import os
 import logger
 from astral.sun import sun
-from dotenv import load_dotenv
 from pycololight import PyCololight
+from dotenv import find_dotenv, load_dotenv, set_key
 
 # related to ID'ing the location
 from typing import Dict, Union
@@ -10,23 +11,51 @@ from astral import LocationInfo, Observer
 from datetime import datetime, timezone, timedelta
 
 
+def ask_for_input(username: str = "smartlife"):
+    """
+    Helper function that pulls environment and/or prompts the user for input
+    :param username:
+    :return: res of .geocode()
+    """
+    dotenv_file = find_dotenv()
+    load_dotenv(dotenv_file)
+    while True:
+        city = os.environ.get("CITY")
+        if not city:
+            user_input = input("Please provide the city your strip is located in: ")
+            if not user_input:
+                continue
+
+            res = GeoNames(username).geocode(user_input)
+            if res:
+                set_key(dotenv_file, "CITY", user_input)
+                break
+
+            print(f"City '{user_input}' could not be found, try a different one.")
+
+        else:
+            res = GeoNames(username).geocode(city)
+            if not res:
+                set_key(dotenv_file, "CITY", "")
+                print(f"City '{city}' was pulled from environment and could not be found, try a different one.")
+                continue
+            else:
+                logger.logInfo(f"Pulled the city '{city}' from environment successfully.")
+                break
+
+    return res
+
+
 def get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
     """
-    Prompts the user to enter their location until a valid input is given.
+    Loads from environment or prompts the user to enter their location until a valid input is given.
     Returns a dictionary with:
         observer: astral.Observer\n
         timezone: datetime.timezone
     """
     loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
 
-    while True:
-        usr_input = input("Please provide the city your strip is located in: ")
-        if not usr_input: continue
-
-        res = GeoNames(username).geocode(usr_input)
-        if res: break
-
-        print(f"City '{usr_input}' could not be found, try a different one.")
+    res = ask_for_input(username)
 
     coordinates = res.point
     gmt_offset = GeoNames(username).reverse_timezone(coordinates).raw["gmtOffset"]
@@ -51,12 +80,15 @@ class LightStrip:
             case "cololight":
                 self.strip = PyCololight(device="strip", host=ip, dynamic_effects=True)
 
+    def change_location(self, city: str):
+        self.city = city # PLACEHOLDER
+
     def check(self):
         sunset = sun(self.city)["sunset"].astimezone(self.city_tz)
         now = datetime.now().astimezone(self.city_tz)
         self.strip.state
 
-        if now >= sunset - timedelta(minutes=30) and not all([self.strip.on, now.hour == 23]):
+        if now >= sunset - timedelta(minutes=30) and not any([self.strip.on, now.hour == 23]):
             self.on()
         if (now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute / 10) % 3 == 0 and self.strip.on:
             self.off()

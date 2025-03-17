@@ -1,19 +1,11 @@
 import asyncio
 import os
 import sys
-
 from dotenv import load_dotenv
 import logger
 from asyncio import sleep
 import light_switch
 
-
-event = asyncio.Event()
-semaphore = 0
-lock = asyncio.Lock()
-extra_tasks = []
-load_dotenv()
-cololight_strip = light_switch.LightStrip(ip=os.getenv("STRIP_IP"))
 
 async def run():
     while True:
@@ -24,9 +16,9 @@ async def run():
         
 def parse(arr):
     out = {
-        "mode": arr[0],
-        "amount": 25 if arr[0] == 'on' and arr[1] == 0 else arr[1],
-        "timer": arr[2]
+        "command": arr[0],
+        "param1": 25 if arr[0] == 'on' and arr[1] == 0 else arr[1],
+        "param2": arr[2]
     }
     return out
 
@@ -40,44 +32,56 @@ async def listen_to_input():
         input_arr = input_arr + [0]*(3-len(input_arr))
         
         input_dict = parse(input_arr)    
-        
-        mode = input_dict['mode']
-        amount = input_dict['amount']
-        timer = input_dict['timer']
+
+        # Command specification
+        command = input_dict['command']
+        # First parameter: brightness for on/off commands, duration for timer, desired city for city
+        param1 = input_dict['param1']
+        # Second parameter: timer for on/off commands
+        param2 = input_dict['param2']
       
-        if mode == "on":
-            cololight_strip.on(int(amount))
+        if command == "on":
+            cololight_strip.on(int(param1))
             
-            if timer:
-                logger.logInfo(f"Timer of {timer} minutes has been set.")
-                extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
+            if param2:
+                logger.logInfo(f"Timer of {param2} minutes has been set.")
+                extra_tasks.append(asyncio.create_task(wait(int(param2) * 60)))
             
             continue
 
-        if mode == "off":
+        if command == "off":
             cololight_strip.off()
             
-            if timer:
-                logger.logInfo(f"Timer of {timer} minutes has been set.")
-                extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
+            if param2:
+                logger.logInfo(f"Timer of {param2} minutes has been set.")
+                extra_tasks.append(asyncio.create_task(wait(int(param2) * 60)))
             continue
 
-        if mode == "timer":
-            logger.logInfo(f"Timer of {timer} minutes has been set.")
-            extra_tasks.append(asyncio.create_task(wait(int(timer) * 60)))
+        if command == "timer":
+            logger.logInfo(f"Timer of {param2} minutes has been set.")
+            extra_tasks.append(asyncio.create_task(wait(int(param2) * 60)))
             continue
 
 
-        if mode == "stop":
+        if command == "stop":
             await kill()
             logger.logInfo("All timers have been killed.")
             continue
 
-        if mode == "exit":
+        if command == "city":
+            if not param1:
+                print(f"Current city is: '{os.environ.get('''CITY''')}'")
+            else:
+                print("Current city has been updated.")
+                logger.logInfo(f"Current city has been updated.")
+                cololight_strip.on(param1)
+            continue
+
+        if command == "exit":
             sys.exit(0)
         
         # if no if block hit
-        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer','stop'. Got '{input_arr[0]}'.")
+        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'exit'. Got '{input_arr[0]}'.")
 
 
 async def wait(seconds):
@@ -115,6 +119,13 @@ async def main():
 if __name__ == "__main__":
     try:
         logger.logInfo("Starting the application.")
+        event = asyncio.Event()
+        semaphore = 0
+        lock = asyncio.Lock()
+        extra_tasks = []
+        load_dotenv()
+        cololight_strip = light_switch.LightStrip(ip=os.getenv("STRIP_IP"))
+
         asyncio.run(main())
     except Exception as e:
         logger.logCritical(f"Critical error: {e=}" )
