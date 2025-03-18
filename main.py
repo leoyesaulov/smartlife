@@ -1,7 +1,7 @@
 import asyncio
-import os
 import sys
-from dotenv import load_dotenv
+import traceback
+from dotenv import find_dotenv, load_dotenv, get_key
 import logger
 from asyncio import sleep
 import light_switch
@@ -14,13 +14,18 @@ async def run():
         logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
         
-def parse(arr):
+def _parse(arr):
     out = {
         "command": arr[0],
         "param1": '25' if arr[0] == 'on' and arr[1] == 0 else arr[1],
         "param2": arr[2]
     }
     return out
+
+def _get_from_env(key: str):
+    dotenv_file = find_dotenv()
+    load_dotenv(dotenv_file)
+    return get_key(dotenv_file, key)
 
 async def listen_to_input():
     loop = asyncio.get_event_loop()
@@ -31,7 +36,7 @@ async def listen_to_input():
         # padding the list
         input_arr = input_arr + [0]*(3-len(input_arr))
         
-        input_dict = parse(input_arr)    
+        input_dict = _parse(input_arr)
 
         # Command specification
         command = input_dict['command']
@@ -70,11 +75,11 @@ async def listen_to_input():
 
         if command == "city":
             if not param1:
-                print(f"Current city is: '{os.environ.get('''CITY''')}'")
+                print(f"Current city is: '{_get_from_env('''CITY''')}'")
             else:
+                cololight_strip.change_location(param1)
                 print("Current city has been updated.")
                 logger.logInfo(f"Current city has been updated.")
-                cololight_strip.change_location(param1)
             continue
 
         if command == "exit":
@@ -124,11 +129,11 @@ if __name__ == "__main__":
         lock = asyncio.Lock()
         extra_tasks = []
         load_dotenv()
-        cololight_strip = light_switch.LightStrip(ip=os.getenv("STRIP_IP"))
+        cololight_strip = light_switch.LightStrip(ip=_get_from_env("STRIP_IP"))
 
         asyncio.run(main())
     except Exception as e:
-        logger.logCritical(f"Critical error: {e=}" )
+        logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
     finally:
         logger.logFatal("Terminating...")
         logger.logEmpty()

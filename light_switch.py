@@ -16,10 +16,10 @@ def _update_env(key: str, value: str):
     load_dotenv(dotenv_file)
     set_key(dotenv_file, key, value)
 
-def _get_dict(string: str, username: str = "smartlife"):
+def _get_dict(string: str, username: str = "smartlife2"):
     return GeoNames(username).geocode(string)
 
-def _ask_for_input(username: str = "smartlife"):
+def _ask_for_input(username: str = "smartlife2"):
     """
     Helper function that pulls environment and/or prompts the user for input
     :param username:
@@ -51,7 +51,7 @@ def _ask_for_input(username: str = "smartlife"):
 
     return res
 
-def _res_to_loc(res, username: str = "smartlife"):
+def _res_to_loc(res, username: str = "smartlife2"):
     loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
 
     coordinates = res.point
@@ -67,7 +67,7 @@ def _res_to_loc(res, username: str = "smartlife"):
     return loc
 
 
-def _get_user_location(username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
+def _get_user_location(username: str = "smartlife2") -> Dict[str, Union[Observer, timezone]]:
     """
     Loads from environment or prompts the user to enter their location until a valid input is given.
     Returns a dictionary with:
