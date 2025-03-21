@@ -5,53 +5,26 @@ from pycololight import PyCololight
 from dotenv import find_dotenv, load_dotenv, set_key
 
 # related to ID'ing the location
-from typing import Dict, Union
+from typing import Dict, Union, Tuple, Any
 from geopy.geocoders import GeoNames
 from astral import LocationInfo, Observer
 from datetime import datetime, timezone, timedelta
 
 
-def _update_env(key: str, value: str):
+def _log_to_env(value: str, key: str = "CITY") -> None:
+    """
+    Logs value as key in the .env
+    """
     dotenv_file = find_dotenv()
     load_dotenv(dotenv_file)
     set_key(dotenv_file, key, value)
+    return
 
-def _get_dict(string: str, username: str = "smartlife2"):
-    return GeoNames(username).geocode(string)
 
-def _ask_for_input(username: str = "smartlife2"):
-    """
-    Helper function that pulls environment and/or prompts the user for input
-    :param username:
-    :return: res of .geocode()
-    """
-    while True:
-        city = os.environ.get("CITY")
-        if not city:
-            user_input = input("Please provide the city your strip is located in: ")
-            if not user_input:
-                continue
+def _str_to_res(city: str, username: str = "smartlife") -> Any:
+    return GeoNames(username).geocode(city)
 
-            res = GeoNames(username).geocode(user_input)
-            if res:
-                _update_env("CITY", user_input)
-                break
-
-            print(f"City '{user_input}' could not be found, try a different one.")
-
-        else:
-            res = GeoNames(username).geocode(city)
-            if not res:
-                _update_env("CITY", "")
-                print(f"City '{city}' was pulled from environment and could not be found, try a different one.")
-                continue
-            else:
-                logger.logInfo(f"Pulled the city '{city}' from environment successfully.")
-                break
-
-    return res
-
-def _res_to_loc(res, username: str = "smartlife2"):
+def _res_to_loc(res: Any, username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
     loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
 
     coordinates = res.point
@@ -59,50 +32,93 @@ def _res_to_loc(res, username: str = "smartlife2"):
     tz = timezone(timedelta(hours=gmt_offset))
     loc.update({"timezone": tz})
 
-    # needed further down the line
     observer = LocationInfo(latitude=coordinates.latitude, longitude=coordinates.longitude).observer
     loc.update({"observer": observer})
 
     assert all(loc.values()), "Error has occurred while filling the location dictionary: the dict is empty"
+
     return loc
 
-
-def _get_user_location(username: str = "smartlife2") -> Dict[str, Union[Observer, timezone]]:
+def _get_user_location(preset_loc: str = None, username: str = "smartlife") -> Tuple[
+    Dict[str, Union[Observer, timezone]], str]:
     """
-    Loads from environment or prompts the user to enter their location until a valid input is given.
-    Returns a dictionary with:
+    Parses user's location into Observer object and timezone.\n
+    Unless preset_loc is given, prompts the user to enter their location until a valid input is given.\n
+    Dictionary with:
         observer: astral.Observer\n
         timezone: datetime.timezone
+    :returns: Dictionary
     """
+    while True:
+        # preset_loc MUST be valid, unless we want the app to get stuck in the loop
+        if preset_loc:
+            usr_input = preset_loc
+        else:
+            usr_input = input("Please provide the city your strip is located in: ")
 
-    res = _ask_for_input(username)
-    return _res_to_loc(res, username)
+        if not usr_input: continue
+
+        res = _str_to_res(usr_input, username)
+        if res: break
+
+        print(f"City '{usr_input}' could not be found, try a different one.")
+
+    return _res_to_loc(res), usr_input
 
 
 class LightStrip:
     def __init__(self, ip, device='cololight'):
-        load_dotenv()
-        user_loc = _get_user_location()
+        preset_loc = os.environ.get("CITY")
+        # A reminder to the user
+        if preset_loc:
+            print(f"Your location is: {preset_loc.capitalize()}.\n"
+                  f"To change it run 'city <param>' or 'changeloc'.")
+        user_loc, user_inp = _get_user_location(preset_loc=preset_loc)
+
+        _log_to_env(key="CITY", value=user_inp)
+
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
-        match device:
-            case "cololight":
-                self.strip = PyCololight(device="strip", host=ip, dynamic_effects=True)
 
-    def change_location(self, city: str):
-        res = _ask_for_input(city)
+        if device == "cololight":
+            self.strip = PyCololight(device="strip", host=ip, dynamic_effects=True)
+        # adding other devices as time goes on
+        else:
+            raise ValueError(f"Your device {device} is not supported.")
+        return
+
+    def change_location(self):
+        user_loc, user_inp = _get_user_location()
+
+        _log_to_env(key="CITY", value=user_inp)
+
+        self.city = user_loc["observer"]
+        self.city_tz = user_loc["timezone"]
+
+        print(f"Current city has been updated to '{user_inp.capitalize()}'.")
+        logger.logInfo(f"Current city has been updated to '{user_inp.capitalize()}'.")
+        return
+
+    def change_location_with_param(self, city: str):
+        res = _str_to_res(city)
         if not res:
-            print(f"I was unable to find city '{city}'. Try again.")
+            print(f"City '{city}' could not be found, try a different one.")
             return
-        _update_env("CITY", city)
-        loc = _res_to_loc(res)                                                      # ToDo: usernames not supported here, fix when multi-devicing
+
+        loc = _res_to_loc(res)
+
+        _log_to_env(key="CITY", value=city)
+
         self.city = loc["observer"]
         self.city_tz = loc["timezone"]
+        print(f"Current city has been updated to '{city.capitalize()}'.")
+        logger.logInfo(f"Current city has been updated to '{city.capitalize()}'.")
+        return
 
     def check(self):
+        self.strip.state
         sunset = sun(self.city)["sunset"].astimezone(self.city_tz)
         now = datetime.now().astimezone(self.city_tz)
-        self.strip.state
 
         if now >= sunset - timedelta(minutes=30) and not any([self.strip.on, now.hour == 23]):
             self.on()
@@ -115,5 +131,6 @@ class LightStrip:
         self.strip.on = brightness
 
     def off(self):
-        logger.logInfo(f"Turning lights off.")
+        self.strip.state
+        logger.logInfo("Turning the lights off.")
         self.strip.on = 0

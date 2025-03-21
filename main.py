@@ -1,13 +1,12 @@
 import asyncio
 import sys
-import traceback
-from dotenv import find_dotenv, load_dotenv, get_key
+from dotenv import load_dotenv, find_dotenv, get_key
 import logger
 from asyncio import sleep
 import light_switch
 
 
-async def run():
+async def _run():
     while True:
         await event.wait()
         cololight_strip.check()
@@ -22,7 +21,7 @@ def _parse(arr):
     }
     return out
 
-def _get_from_env(key: str):
+def _get_from_env(key: str) -> str:
     dotenv_file = find_dotenv()
     load_dotenv(dotenv_file)
     return get_key(dotenv_file, key)
@@ -69,17 +68,20 @@ async def listen_to_input():
 
 
         if command == "stop":
-            await kill()
+            await _kill()
             logger.logInfo("All timers have been killed.")
             continue
 
         if command == "city":
             if not param1:
-                print(f"Current city is: '{_get_from_env('''CITY''')}'")
+                print(f"Current city is: '{_get_from_env('''CITY''').capitalize()}'")
             else:
-                cololight_strip.change_location(param1)
-                print("Current city has been updated.")
-                logger.logInfo(f"Current city has been updated.")
+                cololight_strip.change_location_with_param(param1)
+                
+            continue
+
+        if command == "changeloc":
+            cololight_strip.change_location()
             continue
 
         if command == "exit":
@@ -90,25 +92,25 @@ async def listen_to_input():
 
 
 async def wait(seconds):
-    await enter()
+    await _enter()
     await asyncio.sleep(seconds)
     logger.logInfo(f"Wait complete." )
-    await release()
+    await _release()
 
-async def enter():
+async def _enter():
     global semaphore
     async with lock:
         semaphore += 1
     event.clear()
 
-async def release():
+async def _release():
     global semaphore
     async with lock:
         semaphore -= 1
         if semaphore <= 0:
             event.set()
 
-async def kill():
+async def _kill():
     global extra_tasks
     global semaphore
     async with lock:
@@ -117,9 +119,9 @@ async def kill():
         semaphore = 0
         event.set()
 
-async def main():
+async def _main():
     event.set()
-    await asyncio.gather(run(), listen_to_input())
+    await asyncio.gather(_run(), listen_to_input())
 
 if __name__ == "__main__":
     try:
@@ -131,7 +133,7 @@ if __name__ == "__main__":
         load_dotenv()
         cololight_strip = light_switch.LightStrip(ip=_get_from_env("STRIP_IP"))
 
-        asyncio.run(main())
+        asyncio.run(_main())
     except Exception as e:
         logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
     finally:
