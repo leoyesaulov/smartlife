@@ -1,5 +1,4 @@
 import asyncio
-import os
 import sys
 from dotenv import load_dotenv, find_dotenv, get_key
 import logger
@@ -78,7 +77,7 @@ async def listen_to_input():
                 print(f"Current city is: '{_get_from_env('''CITY''').capitalize()}'")
             else:
                 cololight_strip.change_location_with_param(param1)
-
+                
             continue
 
         if command == "changeloc":
@@ -132,11 +131,11 @@ if __name__ == "__main__":
         lock = asyncio.Lock()
         extra_tasks = []
         load_dotenv()
-        cololight_strip = light_switch.LightStrip(ip=os.getenv("STRIP_IP"))
+        cololight_strip = light_switch.LightStrip(ip=_get_from_env("STRIP_IP"))
 
         asyncio.run(_main())
     except Exception as e:
-        logger.logCritical(f"Critical error: {e=}" )
+        logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
     finally:
         logger.logFatal("Terminating...")
         logger.logEmpty()

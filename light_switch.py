@@ -20,6 +20,7 @@ def _log_to_env(value: str, key: str = "CITY") -> None:
     set_key(dotenv_file, key, value)
     return
 
+
 def _str_to_res(city: str, username: str = "smartlife") -> Any:
     return GeoNames(username).geocode(city)
 
@@ -37,7 +38,6 @@ def _res_to_loc(res: Any, username: str = "smartlife") -> Dict[str, Union[Observ
     assert all(loc.values()), "Error has occurred while filling the location dictionary: the dict is empty"
 
     return loc
-
 
 def _get_user_location(preset_loc: str = None, username: str = "smartlife") -> Tuple[
     Dict[str, Union[Observer, timezone]], str]:
