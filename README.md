@@ -17,6 +17,12 @@ Available inputs:
 
 `stop` - Kills all timers
 
+`city <city>` - Prints out current location, changes location if `<city>` is provided
+
+`changeloc` - Starts the location-changing flow (same effect as `city <city>`, but in a more interactive manner)
+
+`exit` - Actually exits the program
+
 Controlled device(s):
 ---
 - [Cololight Strip](https://cololight.de/products/cololight-strip?variant=32881788387392) (props to [pycololight](https://github.com/BazaJayGee66/pycololight) for reverse-engineering their API)
