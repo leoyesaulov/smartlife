@@ -8,6 +8,8 @@ from data_handler import DataHandler
 
 
 async def __run():
+    loop = asyncio.get_event_loop()
+    loop.set_exception_handler(__exception_handler)
     while True:
         await __event.wait()
         __cololight_strip.check()
@@ -26,6 +28,7 @@ async def __listen_to_input():
     loop = asyncio.get_event_loop()
     while True:
         user_input = await loop.run_in_executor(None, input, "")
+        logger.logInfo(f"User input: {user_input}")
         input_arr = user_input.lower().split()
 
         # padding the list
@@ -119,6 +122,13 @@ async def __main():
     __event.set()
     await asyncio.gather(__run(), __listen_to_input())
 
+def __exception_handler(loop, context):
+    exception = context.get("exception")
+    message = context.get("message")
+    if type(exception) is not SystemExit:
+        logger.logDebug(f"exception type: {type(exception)}")
+        logger.logError(f"async exception has been raised: {exception} with message: {message}")
+
 if __name__ == "__main__":
     try:
         logger.logInfo("Starting the application.")
@@ -130,6 +140,11 @@ if __name__ == "__main__":
         __cololight_strip = LightStrip(ip=__data_handler.get("STRIP_IP"))
 
         asyncio.run(__main())
+    except SystemExit as e:
+        print("Exiting peacefully...")
+    except KeyboardInterrupt:
+        logger.logInfo("Keyboard interrupt.")
+        print("Exiting peacefully...")
     except Exception as e:
         logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
     finally:
