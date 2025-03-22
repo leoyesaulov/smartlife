@@ -1,19 +1,20 @@
-import asyncio
 import sys
-from dotenv import load_dotenv, find_dotenv, get_key
 import logger
+import asyncio
+import traceback
 from asyncio import sleep
-import light_switch
+from light_switch import LightStrip
+from data_handler import DataHandler
 
 
-async def _run():
+async def __run():
     while True:
-        await event.wait()
-        cololight_strip.check()
+        await __event.wait()
+        __cololight_strip.check()
         logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
         
-def _parse(arr):
+def __parse(arr):
     out = {
         "command": arr[0],
         "param1": '25' if arr[0] == 'on' and arr[1] == 0 else arr[1],
@@ -21,12 +22,7 @@ def _parse(arr):
     }
     return out
 
-def _get_from_env(key: str) -> str:
-    dotenv_file = find_dotenv()
-    load_dotenv(dotenv_file)
-    return get_key(dotenv_file, key)
-
-async def listen_to_input():
+async def __listen_to_input():
     loop = asyncio.get_event_loop()
     while True:
         user_input = await loop.run_in_executor(None, input, "")
@@ -35,7 +31,7 @@ async def listen_to_input():
         # padding the list
         input_arr = input_arr + [0]*(3-len(input_arr))
         
-        input_dict = _parse(input_arr)
+        input_dict = __parse(input_arr)
 
         # Command specification
         command = input_dict['command']
@@ -45,43 +41,43 @@ async def listen_to_input():
         param2 = input_dict['param2']
       
         if command == "on":
-            cololight_strip.on(int(param1))
+            __cololight_strip.on(int(param1))
             
             if param2:
                 logger.logInfo(f"Timer of {param2} minutes has been set.")
-                extra_tasks.append(asyncio.create_task(wait(int(param2) * 60)))
+                __extra_tasks.append(asyncio.create_task(__wait(int(param2) * 60)))
             
             continue
 
         if command == "off":
-            cololight_strip.off()
+            __cololight_strip.off()
             
             if param2:
                 logger.logInfo(f"Timer of {param2} minutes has been set.")
-                extra_tasks.append(asyncio.create_task(wait(int(param2) * 60)))
+                __extra_tasks.append(asyncio.create_task(__wait(int(param2) * 60)))
             continue
 
         if command == "timer":
             logger.logInfo(f"Timer of {param2} minutes has been set.")
-            extra_tasks.append(asyncio.create_task(wait(int(param2) * 60)))
+            __extra_tasks.append(asyncio.create_task(__wait(int(param2) * 60)))
             continue
 
 
         if command == "stop":
-            await _kill()
+            await __kill()
             logger.logInfo("All timers have been killed.")
             continue
 
         if command == "city":
             if not param1:
-                print(f"Current city is: '{_get_from_env('''CITY''').capitalize()}'")
+                print(f"Current city is: '{__data_handler.get('''CITY''').capitalize()}'")
             else:
-                cololight_strip.change_location_with_param(param1)
+                __cololight_strip.change_location_with_param(param1)
                 
             continue
 
         if command == "changeloc":
-            cololight_strip.change_location()
+            __cololight_strip.change_location()
             continue
 
         if command == "exit":
@@ -91,49 +87,49 @@ async def listen_to_input():
         print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'exit'. Got '{input_arr[0]}'.")
 
 
-async def wait(seconds):
-    await _enter()
+async def __wait(seconds):
+    await __enter()
     await asyncio.sleep(seconds)
     logger.logInfo(f"Wait complete." )
-    await _release()
+    await __release()
 
-async def _enter():
-    global semaphore
-    async with lock:
-        semaphore += 1
-    event.clear()
+async def __enter():
+    global __semaphore
+    async with __lock:
+        __semaphore += 1
+    __event.clear()
 
-async def _release():
-    global semaphore
-    async with lock:
-        semaphore -= 1
-        if semaphore <= 0:
-            event.set()
+async def __release():
+    global __semaphore
+    async with __lock:
+        __semaphore -= 1
+        if __semaphore <= 0:
+            __event.set()
 
-async def _kill():
-    global extra_tasks
-    global semaphore
-    async with lock:
-        for task in extra_tasks:
+async def __kill():
+    global __extra_tasks
+    global __semaphore
+    async with __lock:
+        for task in __extra_tasks:
             task.cancel()
-        semaphore = 0
-        event.set()
+        __semaphore = 0
+        __event.set()
 
-async def _main():
-    event.set()
-    await asyncio.gather(_run(), listen_to_input())
+async def __main():
+    __event.set()
+    await asyncio.gather(__run(), __listen_to_input())
 
 if __name__ == "__main__":
     try:
         logger.logInfo("Starting the application.")
-        event = asyncio.Event()
-        semaphore = 0
-        lock = asyncio.Lock()
-        extra_tasks = []
-        load_dotenv()
-        cololight_strip = light_switch.LightStrip(ip=_get_from_env("STRIP_IP"))
+        __event = asyncio.Event()
+        __semaphore = 0
+        __lock = asyncio.Lock()
+        __extra_tasks = []
+        __data_handler = DataHandler()
+        __cololight_strip = LightStrip(ip=__data_handler.get("STRIP_IP"))
 
-        asyncio.run(_main())
+        asyncio.run(__main())
     except Exception as e:
         logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
     finally:
