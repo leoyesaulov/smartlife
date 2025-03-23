@@ -30,7 +30,7 @@ Controlled device(s):
 Usage:
 ---
 ### Windows:
-- Pull the repo
+- Pull the repo (don't forget to change working directory)
 - Run `make setup` if running for the first time, otherwise `make run` will suffice
 - Profit!
 
