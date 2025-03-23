@@ -7,7 +7,7 @@ clean:
 	rmdir /s /q venv
 
 run:
-	venv\Scripts\activate && py main.py
+	venv\Scripts\activate && pip install -r requirements.txt && py main.py
 
 upd_req:
 	venv\Scripts\activate && pip freeze > requirements.txt
