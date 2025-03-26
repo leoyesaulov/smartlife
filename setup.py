@@ -1,7 +1,7 @@
 from data_handler import DataHandler
 
 __data_handler = DataHandler()
-__strip_ip = ""
+__strip_ip = __data_handler.get('strip_ip')
 
 while __strip_ip == "":
     __strip_ip = input("Please enter ip of your cololight strip: ")
