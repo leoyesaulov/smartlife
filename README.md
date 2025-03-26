@@ -17,6 +17,8 @@ Available inputs:
 
 `stop` - Kills all timers
 
+`state` - Requests current state of the strip and prints it out
+
 `city <city>` - Prints out current location, changes location if `<city>` is provided
 
 `changeloc` - Starts the location-changing flow (same effect as `city <city>`, but in a more interactive manner)
