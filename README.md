@@ -13,7 +13,7 @@ Available inputs:
 
 `off <time=0>` - Turns the lights off and starts the `timer` of `time` minutes.
 
-`timer <time>` - Sets the timer for `time` minutes (disables the automatic turning on/off for the duration of the timer)
+`timer <time=0>` - Sets the timer for `time` minutes (disables the automatic turning on/off for the duration of the timer)
 
 `stop` - Kills all timers
 
