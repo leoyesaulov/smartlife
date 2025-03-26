@@ -7,8 +7,9 @@ from data_handler import DataHandler
 # related to ID'ing the location
 from datetime import datetime, timedelta
 
-class LightStrip:
-    def __init__(self, ip, device='cololight'):
+class ColoStrip:
+    def __init__(self, ip, id, device='cololight'):
+        self.id = id
         self.__data_handler = DataHandler()
         preset_loc = self.__data_handler.get("CITY")
         self.__city_handler = CityHandler()

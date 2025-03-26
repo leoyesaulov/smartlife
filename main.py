@@ -3,7 +3,7 @@ import logger
 import asyncio
 import traceback
 from asyncio import sleep
-from light_switch import LightStrip
+from colo_strip import ColoStrip
 from data_handler import DataHandler
 
 
@@ -143,15 +143,28 @@ def __exception_handler(loop, context):
         logger.logDebug(f"exception type: {type(exception)}")
         logger.logError(f"async exception has been raised: {exception} with message: {message}")
 
+def __get_from_db(id):
+    pass
+
+def __put_to_db(id, value):
+    pass
+
+def __init_db():
+    pass
+
 if __name__ == "__main__":
+    __device_counter = 0
+    __devices = {}
+    __event = asyncio.Event()
+    __semaphore = 0
+    __lock = asyncio.Lock()
+    __extra_tasks = []
+    __data_handler = DataHandler()
+
     try:
         logger.logInfo("Starting the application.")
-        __event = asyncio.Event()
-        __semaphore = 0
-        __lock = asyncio.Lock()
-        __extra_tasks = []
-        __data_handler = DataHandler()
-        __cololight_strip = LightStrip(ip=__data_handler.get("STRIP_IP"))
+        __cololight_strip = ColoStrip(ip=__data_handler.get("STRIP_IP"), id=__device_counter)
+        __device_counter += 1
 
         asyncio.run(__main())
     except SystemExit as e:
