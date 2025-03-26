@@ -9,5 +9,5 @@ clean:
 run:
 	venv\Scripts\activate && pip install -r requirements.txt && py main.py
 
-upd_req:
+freeze:
 	venv\Scripts\activate && pip freeze > requirements.txt
