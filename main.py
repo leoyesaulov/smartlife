@@ -47,8 +47,7 @@ async def __listen_to_input():
             __cololight_strip.on(int(param1))
             
             if param2:
-                logger.logInfo(f"Timer of {param2} minutes has been set.")
-                __extra_tasks.append(asyncio.create_task(__wait(int(param2) * 60)))
+                 __timer(int(param2))
             
             continue
 
@@ -56,13 +55,11 @@ async def __listen_to_input():
             __cololight_strip.off()
             
             if param2:
-                logger.logInfo(f"Timer of {param2} minutes has been set.")
-                __extra_tasks.append(asyncio.create_task(__wait(int(param2) * 60)))
+                __timer(int(param2))
             continue
 
         if command == "timer":
-            logger.logInfo(f"Timer of {param2} minutes has been set.")
-            __extra_tasks.append(asyncio.create_task(__wait(int(param2) * 60)))
+            __timer(int(param1))
             continue
 
 
@@ -93,11 +90,24 @@ async def __listen_to_input():
         # if no if block hit
         print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'exit'. Got '{input_arr[0]}'.")
 
+def __timer(duration: int):
+    """
+    Sets the timer of <duration> minutes.\n
+    While the timer is active, no automated checks will be performed.
+    :param duration:
+    :return:
+    """
+    if duration >= 0:
+        logger.logInfo(f"Timer of {duration} minutes has been set.", print)
+        __extra_tasks.append(asyncio.create_task(__wait(int(duration) * 60)))
+    else:
+        logger.logError(f"Duration of {duration} minutes is invalid for timer function", print)
+
 
 async def __wait(seconds):
     await __enter()
     await asyncio.sleep(seconds)
-    logger.logInfo(f"Wait complete." )
+    logger.logInfo(f"Wait complete.", print)
     await __release()
 
 async def __enter():

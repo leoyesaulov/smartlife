@@ -35,8 +35,7 @@ class LightStrip:
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
 
-        print(f"Current city has been updated to '{user_inp.capitalize()}'.")
-        logger.logInfo(f"Current city has been updated to '{user_inp.capitalize()}'.")
+        logger.logInfo(f"Current city has been updated to '{user_inp.capitalize()}'.", print)
         return
 
     def change_location_with_param(self, city: str):
@@ -46,8 +45,7 @@ class LightStrip:
         self.city = loc["observer"]
         self.city_tz = loc["timezone"]
 
-        print(f"Current city has been updated to '{city.capitalize()}'.")
-        logger.logInfo(f"Current city has been updated to '{city.capitalize()}'.")
+        logger.logInfo(f"Current city has been updated to '{city.capitalize()}'.", print)
         return
 
     def check(self):
@@ -62,12 +60,12 @@ class LightStrip:
 
     def on(self, brightness=25):
         self.strip.state
-        logger.logInfo(f"Turning lights on with previous brightness: {self.strip.brightness}.")
+        logger.logInfo(f"Turning lights on with previous brightness: {self.strip.brightness}.", print)
         self.strip.on = brightness
 
     def off(self):
         self.strip.state
-        logger.logInfo("Turning the lights off.")
+        logger.logInfo("Turning the lights off.", print)
         self.strip.on = 0
         self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
 

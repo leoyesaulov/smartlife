@@ -32,22 +32,31 @@ __empty_logger.addHandler(__empty_handler)
 __base_logger.setLevel(logging.DEBUG)
 __empty_logger.setLevel(logging.DEBUG)
 
-def logInfo(message):
+def nothing(str):
+    return
+
+def logInfo(message, func=nothing):
+    func(message)
     __base_logger.info(message)
 
-def logWarning(message):
+def logWarning(message, func=nothing):
+    func(message)
     __base_logger.warning(message)
 
-def logError(message):
+def logError(message, func=nothing):
+    func(message)
     __base_logger.error(message)
 
-def logCritical(message):
+def logCritical(message, func=nothing):
+    func(message)
     __base_logger.critical(message)
 
-def logDebug(message):
+def logDebug(message, func=nothing):
+    func(message)
     __base_logger.debug(message)
 
-def logFatal(message):
+def logFatal(message, func=nothing):
+    func(message)
     __base_logger.fatal(message)
 
 def logEmpty():
