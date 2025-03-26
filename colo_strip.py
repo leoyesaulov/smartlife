@@ -67,8 +67,8 @@ class ColoStrip:
     def off(self):
         self.strip.state
         logger.logInfo("Turning the lights off.", print)
-        self.strip.on = 0
-        self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
+        self.strip.on = None
+        #self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
 
 
     def get_state(self):

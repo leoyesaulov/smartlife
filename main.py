@@ -84,6 +84,10 @@ async def __listen_to_input():
             __cololight_strip.get_state()
             continue
 
+        if command == "refresh":
+            __cololight_strip.check()
+            continue
+
         if command == "exit":
             sys.exit(0)
         
