@@ -13,9 +13,11 @@ Available inputs:
 
 `off <time=0>` - Turns the lights off and starts the `timer` of `time` minutes.
 
-`timer <time>` - Sets the timer for `time` minutes (disables the automatic turning on/off for the duration of the timer)
+`timer <time=0>` - Sets the timer for `time` minutes (disables the automatic turning on/off for the duration of the timer)
 
 `stop` - Kills all timers
+
+`state` - Requests current state of the strip and prints it out
 
 `city <city>` - Prints out current location, changes location if `<city>` is provided
 
@@ -30,7 +32,7 @@ Controlled device(s):
 Usage:
 ---
 ### Windows:
-- Pull the repo (don't forget to change working directory)
+- Pull the repo (don't forget to change your working directory)
 - Run `make setup` if running for the first time, otherwise `make run` will suffice
 - Profit!
 
