@@ -83,6 +83,10 @@ async def __listen_to_input():
             __cololight_strip.change_location()
             continue
 
+        if command == "state":
+            __cololight_strip.get_state()
+            continue
+
         if command == "exit":
             sys.exit(0)
         
