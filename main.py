@@ -27,7 +27,7 @@ def __parse(arr):
 async def __listen_to_input():
     loop = asyncio.get_event_loop()
     while True:
-        user_input = await loop.run_in_executor(None, input, "")
+        user_input = await loop.run_in_executor(None, input, ">>> ")
         logger.logInfo(f"User input: {user_input}")
         input_arr = user_input.lower().split()
 
