@@ -1,7 +1,6 @@
-import logging
-from logging import FileHandler
+from logging import FileHandler, getLogger, INFO, Formatter
 
-__base_logger = logging.getLogger("base")
+__base_logger = getLogger("base")
 
 __base_handler = FileHandler(
     filename='.log',
@@ -9,9 +8,9 @@ __base_handler = FileHandler(
     encoding='utf-8',
 )
 
-__base_handler.setLevel(logging.DEBUG)
+__base_handler.setLevel(INFO)
 
-__fmt = logging.Formatter(
+__fmt = Formatter(
     fmt='%(name)s.%(levelname)s at %(asctime)s: %(message)s',
     datefmt='%d.%m.%Y %H:%M:%S',
 )
@@ -19,7 +18,7 @@ __fmt = logging.Formatter(
 __base_handler.setFormatter(__fmt)
 
 __base_logger.addHandler(__base_handler)
-__base_logger.setLevel(logging.DEBUG)
+__base_logger.setLevel(INFO)
 
 
 def nothing(str):
