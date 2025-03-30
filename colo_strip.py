@@ -1,4 +1,6 @@
 import logger
+import traceback
+from time import sleep
 from astral.sun import sun
 from pycololight import PyCololight
 from city_handler import CityHandler
@@ -7,7 +9,26 @@ from data_handler import DataHandler
 # related to ID'ing the location
 from datetime import datetime, timedelta
 
+
 class ColoStrip:
+    def __check_connection(self):
+        error = None
+        for word in ["First", "Second"]:
+            try:
+                self.strip.state
+                return
+            except Exception as err:
+                print(f"{word} attempt to connect failed")
+                logger.logCritical(f"{word} attempt failed: {err=}\nStacktrace:\n{traceback.format_exc()}")
+                error = err
+                sleep(1)
+
+        if error:
+            logger.logError("Could not connect to Strip.")
+            raise error
+
+        return
+
     def __init__(self, ip, id, device='cololight'):
         self.id = id
         self.__data_handler = DataHandler()
@@ -28,6 +49,8 @@ class ColoStrip:
         # adding other devices as time goes on
         else:
             raise ValueError(f"Your device {device} is not supported.")
+
+        self.__check_connection()
         return
 
     def change_location(self):
@@ -68,8 +91,7 @@ class ColoStrip:
         self.strip.state
         logger.logInfo("Turning the lights off.", print)
         self.strip.on = None
-        #self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
-
+        # self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
 
     def get_state(self):
         self.strip.state

@@ -15,7 +15,8 @@ async def __run():
         __cololight_strip.check()
         logger.logInfo(f"Automated check has been performed.")
         await sleep(600)
-        
+
+
 def __parse(arr):
     out = {
         "command": arr[0],
@@ -23,6 +24,7 @@ def __parse(arr):
         "param2": arr[2]
     }
     return out
+
 
 async def __listen_to_input():
     loop = asyncio.get_event_loop()
@@ -32,8 +34,8 @@ async def __listen_to_input():
         input_arr = user_input.lower().split()
 
         # padding the list
-        input_arr = input_arr + [0]*(3-len(input_arr))
-        
+        input_arr = input_arr + [0] * (3 - len(input_arr))
+
         input_dict = __parse(input_arr)
 
         # Command specification
@@ -42,18 +44,18 @@ async def __listen_to_input():
         param1 = input_dict['param1']
         # Second parameter: timer for on/off commands
         param2 = input_dict['param2']
-      
+
         if command == "on":
             __cololight_strip.on(int(param1))
-            
+
             if param2:
-                 __timer(int(param2))
-            
+                __timer(int(param2))
+
             continue
 
         if command == "off":
             __cololight_strip.off()
-            
+
             if param2:
                 __timer(int(param2))
             continue
@@ -61,7 +63,6 @@ async def __listen_to_input():
         if command == "timer":
             __timer(int(param1))
             continue
-
 
         if command == "stop":
             await __kill()
@@ -73,7 +74,7 @@ async def __listen_to_input():
                 print(f"Current city is: '{__data_handler.get('''CITY''').capitalize()}'")
             else:
                 __cololight_strip.change_location_with_param(param1)
-                
+
             continue
 
         if command == "changeloc":
@@ -90,7 +91,7 @@ async def __listen_to_input():
 
         if command == "exit":
             sys.exit(0)
-        
+
         # if no if block hit
         print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'exit'. Got '{input_arr[0]}'.")
 
@@ -114,11 +115,13 @@ async def __wait(seconds):
     logger.logInfo(f"Wait complete.", print)
     await __release()
 
+
 async def __enter():
     global __semaphore
     async with __lock:
         __semaphore += 1
     __event.clear()
+
 
 async def __release():
     global __semaphore
@@ -126,6 +129,7 @@ async def __release():
         __semaphore -= 1
         if __semaphore <= 0:
             __event.set()
+
 
 async def __kill():
     global __extra_tasks
@@ -136,9 +140,11 @@ async def __kill():
         __semaphore = 0
         __event.set()
 
+
 async def __main():
     __event.set()
     await asyncio.gather(__run(), __listen_to_input())
+
 
 def __exception_handler(loop, context):
     exception = context.get("exception")
@@ -147,14 +153,18 @@ def __exception_handler(loop, context):
         logger.logDebug(f"exception type: {type(exception)}")
         logger.logError(f"async exception has been raised: {exception} with message: {message}")
 
+
 def __get_from_db(id):
     pass
+
 
 def __put_to_db(id, value):
     pass
 
+
 def __init_db():
     pass
+
 
 if __name__ == "__main__":
     __device_counter = 0
@@ -176,7 +186,8 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.logInfo("Keyboard interrupt.")
         print("Exiting peacefully...")
-    except Exception as e:
-        logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
+    except Exception as error:
+        logger.logCritical(f"Critical error: {error=}\nStacktrace:\n{traceback.format_exc()}")
+        print(f"Critical error: {error=}")
     finally:
         logger.logFatal("Terminating...\n")
