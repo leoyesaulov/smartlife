@@ -35,6 +35,10 @@ __empty_logger.setLevel(logging.DEBUG)
 def nothing(str):
     return
 
+# def log(type, message, func):
+#     __base_logger.__getattribute__(type).__call__(message)
+#     __base_logger.log(type, message)
+
 def logInfo(message, func=nothing):
     func(message)
     __base_logger.info(message)
