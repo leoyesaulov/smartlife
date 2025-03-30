@@ -179,5 +179,4 @@ if __name__ == "__main__":
     except Exception as e:
         logger.logCritical(f"Critical error: {e=}\nStacktrace:\n{traceback.format_exc()}")
     finally:
-        logger.logFatal("Terminating...")
-        logger.logEmpty()
+        logger.logFatal("Terminating...\n")
