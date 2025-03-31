@@ -1,7 +1,7 @@
 import sys
-import logger
 import asyncio
 import traceback
+from logger import log
 from asyncio import sleep
 from colo_strip import ColoStrip
 from data_handler import DataHandler
@@ -13,7 +13,7 @@ async def __run():
     while True:
         await __event.wait()
         __cololight_strip.check()
-        logger.logInfo(f"Automated check has been performed.")
+        log(f"Automated check has been performed.", "info")
         await sleep(600)
 
 
@@ -29,8 +29,8 @@ def __parse(arr):
 async def __listen_to_input():
     loop = asyncio.get_event_loop()
     while True:
-        user_input = await loop.run_in_executor(None, input, "")
-        logger.logInfo(f"User input: {user_input}")
+        user_input = await loop.run_in_executor(None, input, ">>> ")
+        log(f"User input: {user_input}", "info")
         input_arr = user_input.lower().split()
 
         # padding the list
@@ -66,7 +66,7 @@ async def __listen_to_input():
 
         if command == "stop":
             await __kill()
-            logger.logInfo("All timers have been killed.")
+            log("All timers have been killed.", "info")
             continue
 
         if command == "city":
@@ -103,16 +103,16 @@ def __timer(duration: int):
     :return:
     """
     if duration >= 0:
-        logger.logInfo(f"Timer of {duration} minutes has been set.", print)
+        log(f"Timer of {duration} minutes has been set.", "info", __print)
         __extra_tasks.append(asyncio.create_task(__wait(int(duration) * 60)))
     else:
-        logger.logError(f"Duration of {duration} minutes is invalid for timer function", print)
+        log(f"Duration of {duration} minutes is invalid for timer function", "error", __print)
 
 
 async def __wait(seconds):
     await __enter()
     await asyncio.sleep(seconds)
-    logger.logInfo(f"Wait complete.", print)
+    log(f"Wait complete.",  "info", __print)
     await __release()
 
 
@@ -150,8 +150,7 @@ def __exception_handler(loop, context):
     exception = context.get("exception")
     message = context.get("message")
     if type(exception) is not SystemExit:
-        logger.logDebug(f"exception type: {type(exception)}")
-        logger.logError(f"async exception has been raised: {exception} with message: {message}")
+        log(f"async exception has been raised: {exception} with message: {message}", "error")
 
 
 def __get_from_db(id):
@@ -166,6 +165,10 @@ def __init_db():
     pass
 
 
+def __print(msg: str) -> None:
+    print(f"\r{msg}", flush=True)
+    print(">>> ", end="", flush=True)
+
 if __name__ == "__main__":
     __device_counter = 0
     __devices = {}
@@ -176,18 +179,18 @@ if __name__ == "__main__":
     __data_handler = DataHandler()
 
     try:
-        logger.logInfo("Starting the application.")
+        log("Starting the application.", "info", print)
         __cololight_strip = ColoStrip(ip=__data_handler.get("STRIP_IP"), id=__device_counter)
         __device_counter += 1
 
         asyncio.run(__main())
     except SystemExit as e:
-        print("Exiting peacefully...")
+        print("\rExiting peacefully...", flush=True)
     except KeyboardInterrupt:
-        logger.logInfo("Keyboard interrupt.")
-        print("Exiting peacefully...")
+        log("Keyboard interrupt.", "info")
+        print("\rExiting peacefully...", flush=True)
     except Exception as error:
-        logger.logCritical(f"Critical error: {error=}\nStacktrace:\n{traceback.format_exc()}")
-        print(f"Critical error: {error=}")
+        log(f"Critical error: {error=}\nStacktrace:\n{traceback.format_exc()}", "critical")
+        print(f"\rCritical error: {error=}", flush=True)
     finally:
-        logger.logFatal("Terminating...\n")
+        log("Terminating...\n", "critical")

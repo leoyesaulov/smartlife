@@ -20,40 +20,16 @@ __base_handler.setFormatter(__fmt)
 __base_logger.addHandler(__base_handler)
 __base_logger.setLevel(INFO)
 
-
-def nothing(str):
-    return
-
-
-# def log(type, message, func):
-#     __base_logger.__getattribute__(type).__call__(message)
-#     __base_logger.log(type, message)
-
-def logInfo(message, func=nothing):
-    func(message)
-    __base_logger.info(message)
+levels = {
+    "notset": 0,
+    "debug": 10,
+    "info": 20,
+    "warning": 30,
+    "error": 40,
+    "critical": 50
+}
 
 
-def logWarning(message, func=nothing):
-    func(message)
-    __base_logger.warning(message)
-
-
-def logError(message, func=nothing):
-    func(message)
-    __base_logger.error(message)
-
-
-def logCritical(message, func=nothing):
-    func(message)
-    __base_logger.critical(message)
-
-
-def logDebug(message, func=nothing):
-    func(message)
-    __base_logger.debug(message)
-
-
-def logFatal(message, func=nothing):
-    func(message)
-    __base_logger.fatal(message)
+def log(message:str, type:str, func=None) -> None:
+    if func: func(message)
+    __base_logger.log(level=levels[type], msg=message)

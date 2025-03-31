@@ -1,5 +1,5 @@
-import logger
 import traceback
+from logger import log
 from time import sleep
 from astral.sun import sun
 from pycololight import PyCololight
@@ -10,6 +10,10 @@ from data_handler import DataHandler
 from datetime import datetime, timedelta
 
 
+def __print(msg: str) -> None:
+    print(f"\r{msg}", flush=True)
+    print(">>> ", end="", flush=True)
+
 class ColoStrip:
     def __check_connection(self):
         error = None
@@ -19,12 +23,12 @@ class ColoStrip:
                 return
             except Exception as err:
                 print(f"{word} attempt to connect failed")
-                logger.logCritical(f"{word} attempt failed: {err=}\nStacktrace:\n{traceback.format_exc()}")
+                log(f"{word} attempt failed: {err=}\nStacktrace:\n{traceback.format_exc()}", "critical")
                 error = err
                 sleep(1)
 
         if error:
-            logger.logError("Could not connect to Strip.")
+            log("Could not connect to Strip.", "error")
             raise error
 
         return
@@ -59,7 +63,7 @@ class ColoStrip:
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
 
-        logger.logInfo(f"Current city has been updated to '{user_inp.capitalize()}'.", print)
+        log(f"Current city has been updated to '{user_inp.capitalize()}'.", "info", print)
         return
 
     def change_location_with_param(self, city: str):
@@ -69,7 +73,7 @@ class ColoStrip:
         self.city = loc["observer"]
         self.city_tz = loc["timezone"]
 
-        logger.logInfo(f"Current city has been updated to '{city.capitalize()}'.", print)
+        log(f"Current city has been updated to '{city.capitalize()}'.", "info", print)
         return
 
     def check(self):
@@ -84,12 +88,12 @@ class ColoStrip:
 
     def on(self, brightness=25):
         self.strip.state
-        logger.logInfo(f"Turning lights on with previous brightness: {self.strip.brightness}.", print)
+        log(f"Turning lights on with previous brightness: {self.strip.brightness}.", "info", __print)
         self.strip.on = brightness
 
     def off(self):
         self.strip.state
-        logger.logInfo("Turning the lights off.", print)
+        log("Turning the lights off.", "info", __print)
         self.strip.on = None
         # self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
 
