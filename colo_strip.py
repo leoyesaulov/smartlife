@@ -10,7 +10,7 @@ from data_handler import DataHandler
 from datetime import datetime, timedelta
 
 
-def __print(msg: str) -> None:
+def _print(msg: str) -> None:
     print(f"\r{msg}", flush=True)
     print(">>> ", end="", flush=True)
 
@@ -88,12 +88,12 @@ class ColoStrip:
 
     def on(self, brightness=25):
         self.strip.state
-        log(f"Turning lights on with previous brightness: {self.strip.brightness}.", "info", __print)
+        log(f"Turning lights on with previous brightness: {self.strip.brightness}.", "info", _print)
         self.strip.on = brightness
 
     def off(self):
         self.strip.state
-        log("Turning the lights off.", "info", __print)
+        log("Turning the lights off.", "info", _print)
         self.strip.on = None
         # self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
 
