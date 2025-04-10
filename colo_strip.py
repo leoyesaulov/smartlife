@@ -2,7 +2,7 @@ import traceback
 from logger import log
 from time import sleep
 from astral.sun import sun
-from pycololight import PyCololight
+from pycololighto import PyCololight
 from city_handler import CityHandler
 from data_handler import DataHandler
 
@@ -19,7 +19,7 @@ class ColoStrip:
         error = None
         for word in ["First", "Second"]:
             try:
-                self.strip.state
+                self.strip.state()
                 return
             except Exception as err:
                 print(f"{word} attempt to connect failed")
@@ -77,7 +77,7 @@ class ColoStrip:
         return
 
     def check(self):
-        self.strip.state
+        self.strip.state()
         sunset = sun(self.city)["sunset"].astimezone(self.city_tz)
         now = datetime.now().astimezone(self.city_tz)
 
@@ -87,16 +87,15 @@ class ColoStrip:
             self.off()
 
     def on(self, brightness=25):
-        self.strip.state
+        self.strip.state()
         log(f"Turning lights on with previous brightness: {self.strip.brightness}.", "info", _print)
         self.strip.on = brightness
 
     def off(self):
-        self.strip.state
-        log("Turning the lights off.", "info", _print)
+        self.strip.state()
+        log("Turning lights off.", "info", _print)
         self.strip.on = None
-        # self.strip.brightness = 0    # Temporary fix until the pycololight library is fixed
 
     def get_state(self):
-        self.strip.state
+        self.strip.state()
         print(self.strip.brightness)
