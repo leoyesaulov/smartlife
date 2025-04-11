@@ -33,7 +33,7 @@ Usage:
 ---
 ### Windows:
 - Pull the repo (don't forget to change your working directory)
-- Run `make setup` if running for the first time, otherwise `make run` will suffice
+- Run `make setup`(currently under maintenance) if running for the first time, otherwise `make run` will suffice
 - Profit!
 
 ### Unix-like:
