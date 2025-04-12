@@ -2,7 +2,7 @@ astral==3.2
 dotenv==0.9.9
 geographiclib==2.0
 geopy==2.4.1
-pycololighto==2.1.0
+pycololighto==2.1.1
 python-dotenv==1.0.1
 pytz==2025.1
 tzdata==2025.1
