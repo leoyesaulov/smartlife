@@ -66,7 +66,7 @@ async def __listen_to_input():
 
         if command == "stop":
             await __kill()
-            log("All timers have been killed.", "info")
+            log("All timers have been killed.", "info", __print)
             continue
 
         if command == "city":
@@ -89,11 +89,15 @@ async def __listen_to_input():
             __cololight_strip.check()
             continue
 
+        if command == "help":
+            print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
+            continue
+
         if command == "exit":
             sys.exit(0)
 
         # if no if block hit
-        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'exit'. Got '{input_arr[0]}'.")
+        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
 
 def __timer(duration: int):
     """
