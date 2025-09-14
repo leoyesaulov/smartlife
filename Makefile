@@ -11,6 +11,6 @@ setup:
 
 run:
 	source venv && pip install -r requirements.txt && python main.py
-
+#
 #freeze:
 #	venv\Scripts\activate && pip freeze > requirements.txt
