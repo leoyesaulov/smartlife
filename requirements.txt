@@ -1,3 +1,5 @@
+fastapi
+uvicorn
 astral==3.2
 dotenv==0.9.9
 geographiclib==2.0
