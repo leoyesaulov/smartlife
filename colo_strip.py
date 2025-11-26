@@ -15,7 +15,7 @@ def _print(msg: str) -> None:
     print(">>> ", end="", flush=True)
 
 class ColoStrip:
-    def __check_connection(self):
+    def check_connection(self):
         error = None
         for word in ["First", "Second"]:
             try:
@@ -35,15 +35,15 @@ class ColoStrip:
 
     def __init__(self, ip, id, device='cololight'):
         self.id = id
-        self.__data_handler = DataHandler()
-        preset_loc = self.__data_handler.get("CITY")
-        self.__city_handler = CityHandler()
+        self.data_handler = DataHandler()
+        preset_loc = self.data_handler.get("CITY")
+        self.city_handler = CityHandler()
         # A reminder to the user
         if preset_loc:
             print(f"Your location is: {preset_loc.capitalize()}.\n"
                   f"To change it run 'city <param>' or 'changeloc'.")
 
-        user_loc, _ = self.__city_handler.city_flow(preset_loc=preset_loc)
+        user_loc, _ = self.city_handler.city_flow(preset_loc=preset_loc)
 
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
@@ -54,11 +54,11 @@ class ColoStrip:
         else:
             raise ValueError(f"Your device {device} is not supported.")
 
-        self.__check_connection()
+        self.check_connection()
         return
 
     def change_location(self):
-        user_loc, user_inp = self.__city_handler.city_flow()
+        user_loc, user_inp = self.city_handler.city_flow()
 
         self.city = user_loc["observer"]
         self.city_tz = user_loc["timezone"]
@@ -67,7 +67,7 @@ class ColoStrip:
         return
 
     def change_location_with_param(self, city: str):
-        loc = self.__city_handler.city_change(city)
+        loc = self.city_handler.city_change(city)
         if not loc: return
 
         self.city = loc["observer"]

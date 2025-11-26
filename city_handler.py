@@ -6,31 +6,31 @@ from typing import Dict, Union, Tuple, Any
 
 class CityHandler:
     def __init__(self, username: str = "smartlife"):
-        self.__username = username
-        self.__data_handler = DataHandler()
+        self.username = username
+        self.data_handler = DataHandler()
 
     def city_flow(self, preset_loc: str = None) -> Tuple[
         Dict[str, Union[Observer, timezone]], str]:
-        user_loc, user_inp = self.__get_user_location(preset_loc=preset_loc, username=self.__username)
-        self.__data_handler.write("CITY", user_inp)
+        user_loc, user_inp = self.get_user_location(preset_loc=preset_loc, username=self.username)
+        self.data_handler.write("CITY", user_inp)
         return user_loc, user_inp
 
     def city_change(self, city: str) -> Dict[str, Union[Observer, timezone]] | None:
-        res = self.__str_to_res(city)
+        res = self.str_to_res(city)
         if not res:
             print(f"City '{city}' could not be found, try a different one one more time.")
             return None
 
-        loc = self.__res_to_loc(res)
+        loc = self.res_to_loc(res)
 
-        self.__data_handler.write(key="CITY", value=city)
+        self.data_handler.write(key="CITY", value=city)
 
         return loc
 
-    def __str_to_res(self, city: str, username: str = "smartlife") -> Any:
+    def str_to_res(self, city: str, username: str = "smartlife") -> Any:
         return GeoNames(username).geocode(city)
 
-    def __res_to_loc(self, res: Any, username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
+    def res_to_loc(self, res: Any, username: str = "smartlife") -> Dict[str, Union[Observer, timezone]]:
         loc: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
 
         coordinates = res.point
@@ -45,7 +45,7 @@ class CityHandler:
 
         return loc
 
-    def __get_user_location(self, preset_loc: str = None, username: str = "smartlife") -> Tuple[
+    def get_user_location(self, preset_loc: str = None, username: str = "smartlife") -> Tuple[
         Dict[str, Union[Observer, timezone]], str]:
         """
         Parses user's location into Observer object and timezone.\n
@@ -64,9 +64,9 @@ class CityHandler:
 
             if not usr_input: continue
 
-            res = self.__str_to_res(usr_input, username=username)
+            res = self.str_to_res(usr_input, username=username)
             if res: break
 
             print(f"City '{usr_input}' could not be found, try a different one.")
 
-        return self.__res_to_loc(res), usr_input
+        return self.res_to_loc(res), usr_input
