@@ -5,6 +5,7 @@ from logger import log
 from asyncio import sleep
 from colo_strip import ColoStrip
 from data_handler import DataHandler
+from api import runApi
 
 
 async def run():
@@ -66,7 +67,7 @@ async def listen_to_input():
 
         if command == "stop":
             await kill()
-            log("All timers have been killed.", "info", print)
+            log("All timers have been killed.", "info", __print)
             continue
 
         if command == "city":
@@ -90,14 +91,14 @@ async def listen_to_input():
             continue
 
         if command == "help":
-            print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
+            __print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
             continue
 
         if command == "exit":
             sys.exit(0)
 
         # if no if block hit
-        print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
+        __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
 
 def timer(duration: int):
     """
@@ -107,16 +108,16 @@ def timer(duration: int):
     :return:
     """
     if duration >= 0:
-        log(f"Timer of {duration} minutes has been set.", "info", print)
+        log(f"Timer of {duration} minutes has been set.", "info", __print)
         extra_tasks.append(asyncio.create_task(wait(int(duration) * 60)))
     else:
-        log(f"Duration of {duration} minutes is invalid for timer function", "error", print)
+        log(f"Duration of {duration} minutes is invalid for timer function", "error", __print)
 
 
 async def wait(seconds):
     await enter()
     await asyncio.sleep(seconds)
-    log(f"Wait complete.",  "info", print)
+    log(f"Wait complete.",  "info", __print)
     await release()
 
 
@@ -147,7 +148,7 @@ async def kill():
 
 async def main():
     event.set()
-    await asyncio.gather(run(), listen_to_input())
+    await asyncio.gather(run(), listen_to_input(), runApi())
 
 
 def exception_handler(loop, context):
@@ -169,7 +170,7 @@ def init_db():
     pass
 
 
-def print(msg: str) -> None:
+def __print(msg: str) -> None:
     print(f"\r{msg}", flush=True)
     print(">>> ", end="", flush=True)
 
@@ -183,7 +184,7 @@ if __name__ == "__main__":
     data_handler = DataHandler()
 
     try:
-        log("Starting the application.", "info", print)
+        log("Starting the application.", "info", __print)
         cololight_strip = ColoStrip(ip=data_handler.get("STRIP_IP"), id=device_counter)
         device_counter += 1
 
