@@ -27,9 +27,11 @@ def updStatus(secret, new_status: bool):
         return HTTPStatus(403)
     else:
         # we change owner_present and if true -> immediate check
+        print(f"new status: {new_status}")
         common.owner_present = new_status
+        print(f"new owner: {common.owner_present}")
         if common.owner_present:
-            print(f"before check owner: {owner_present}")
+            print(f"before check owner: {common.owner_present}")
             cololight_strip.check()
 
         return HTTPStatus(200)
