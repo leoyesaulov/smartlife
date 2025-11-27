@@ -1,10 +1,10 @@
 import sys
 import asyncio
 import traceback
-from api import runApi, active
+from api import runApi
 from logger import log
 from asyncio import sleep
-from common import cololight_strip
+from common import cololight_strip, active
 from data_handler import DataHandler
 
 
