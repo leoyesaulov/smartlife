@@ -27,7 +27,7 @@ def updStatus(secret, new_status: bool):
         # we change owner_present and if true -> immediate check
         common.owner_present = new_status
         if common.owner_present:
-            cololight_strip.check()
+            cololight_strip.on()
 
         return HTTPStatus(200)
 
