@@ -84,7 +84,7 @@ class ColoStrip:
 
         # owner_present: true if owner connected to home network, false otherwise
         # if not home - turn off. If home and otherwise approved - turn on
-        if now >= sunset - timedelta(minutes=30) and not any([self.strip.on, now.hour == 23]) and owner_present:
+        if (now >= sunset - timedelta(minutes=30) and not any([self.strip.on, now.hour == 23])) and owner_present:
             self.on()
         if ((now.hour >= 23 or (0 <= now.hour <= 8)) and int(now.minute / 10) % 3 == 0 and self.strip.on) or not owner_present:
             self.off()
