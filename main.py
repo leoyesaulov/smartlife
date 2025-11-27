@@ -1,11 +1,14 @@
 import sys
 import asyncio
 import traceback
+
 from api import runApi, active
 from logger import log
 from asyncio import sleep
 from devices import cololight_strip
 from data_handler import DataHandler
+
+import argparse
 
 
 async def run():
@@ -32,10 +35,15 @@ def parse(arr):
 
 async def listen_to_input():
     loop = asyncio.get_event_loop()
+    parser = argparse.ArgumentParser()
+    
+    # parser.add_argument()...
+
     while True:
         user_input = await loop.run_in_executor(None, input, "\r>>> ")
         log(f"User input: {user_input}", "info")
-        input_arr = user_input.lower().split()
+
+        parser.parse_args(user_input.split())
 
         # padding the list
         input_arr = input_arr + [0] * (3 - len(input_arr))
