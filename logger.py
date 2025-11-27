@@ -1,5 +1,5 @@
 from logging import FileHandler, getLogger, INFO, Formatter
-from warnings import DeprecatedWarning, warn
+# from warnings import DeprecationWarning, warn
 
 fmt = Formatter(
     fmt='%(name)s.%(levelname)s at %(asctime)s: %(message)s',
@@ -33,5 +33,5 @@ def log(message:str, type:str, func=None) -> None:
     """
     if func: 
         func(message)
-        warn("Usage of argument func is deprecated and will be removed in the future, use a separate function outside of logging", DeprecatedWarning)
+        # warn("Usage of argument func is deprecated and will be removed in the future, use a separate function outside of logging", DeprecatedWarning)
     base_logger.log(level=levels[type], msg=message)
