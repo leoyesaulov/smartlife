@@ -29,7 +29,7 @@ def updStatus(secret, new_status: bool):
         if common.owner_present:
             cololight_strip.check()
 
-    return HTTPStatus(200)
+        return HTTPStatus(200)
 
 # active is updated through this endpoint, which accepts get-requests from (anything?)
 # for a bit better security there's a secret needed to be passed
