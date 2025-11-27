@@ -24,15 +24,6 @@ async def run():
         await sleep(600)
 
 
-def parse(arr):
-    out = {
-        "command": arr[0],
-        "param1": '25' if arr[0] == 'on' and arr[1] == 0 else arr[1],
-        "param2": arr[2]
-    }
-    return out
-
-
 async def listen_to_input():
     loop = asyncio.get_event_loop()
     parser = argparse.ArgumentParser()
@@ -48,22 +39,19 @@ async def listen_to_input():
         # padding the list
         input_arr = input_arr + [0] * (3 - len(input_arr))
 
-        input_dict = parse(input_arr)
-
-        # Command specification
-        command = input_dict['command']
-        # First parameter: brightness for on/off commands, duration for timer, desired city for city
-        param1 = input_dict['param1']
-        # Second parameter: timer for on/off commands
-        param2 = input_dict['param2']
-
-        if command == "on":
-            cololight_strip.on(int(param1))
-
-            if param2:
-                timer(int(param2))
-
-            continue
+        input_dict = {
+            "command": input_arr[0],
+            "param1": input_arr[1],
+            "param2": input_arr[2]
+        }
+        
+        match input_dict:
+            case {"command": "on"} as d:
+                cololight_strip.on(d["param1"])
+                timer(d["param2"])
+    
+            case _:
+                __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
 
         if command == "off":
             cololight_strip.off()
