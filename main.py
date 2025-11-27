@@ -1,11 +1,11 @@
 import sys
 import asyncio
 import traceback
+from api import runApi
 from logger import log
 from asyncio import sleep
-from colo_strip import ColoStrip
+from devices import cololight_strip
 from data_handler import DataHandler
-from api import runApi
 
 
 async def run():
@@ -185,9 +185,6 @@ if __name__ == "__main__":
 
     try:
         log("Starting the application.", "info", __print)
-        cololight_strip = ColoStrip(ip=data_handler.get("STRIP_IP"), id=device_counter)
-        device_counter += 1
-
         asyncio.run(main())
     except SystemExit as e:
         print("\rExiting peacefully...", flush=True)
