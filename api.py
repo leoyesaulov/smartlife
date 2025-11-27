@@ -33,8 +33,8 @@ def updStatus(secret, new_status: bool):
 
 # active is updated through this endpoint, which accepts get-requests from (anything?)
 # for a bit better security there's a secret needed to be passed
-@app.get("/updStatus/{secret}/{new_active}")
-def updStatus(secret, new_active: bool):
+@app.get("/updActive/{secret}/{new_active}")
+def updActive(secret, new_active: bool):
     if secret != api_secret:
         return HTTPStatus(403)
     else:
