@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from common import owner_present
+from common import state
 from data_handler import DataHandler
 from fastapi  import FastAPI
 from devices import cololight_strip
@@ -28,10 +28,10 @@ def updStatus(secret, new_status: bool):
     else:
         # we change owner_present and if true -> immediate check
         print(f"new status: {new_status}")
-        common.owner_present = new_status
-        print(f"new owner: {common.owner_present}")
-        if common.owner_present:
-            print(f"before check owner: {common.owner_present}")
+        state.owner_present = new_status
+        print(f"new owner: {state.owner_present}")
+        if state.owner_present:
+            print(f"before check owner: {state.owner_present}")
             cololight_strip.check()
 
         return HTTPStatus(200)
@@ -44,8 +44,8 @@ def updStatus(secret, new_active: bool):
         return HTTPStatus(403)
     else:
         # we change active and if true -> immediate check
-        common.active = new_active
-        if common.active:
+        state.active = new_active
+        if state.active:
             cololight_strip.check()
 
     return HTTPStatus(200)
