@@ -4,7 +4,6 @@ from common import state
 from data_handler import DataHandler
 from fastapi  import FastAPI
 from devices import cololight_strip
-import common
 import uvicorn
 
 app = FastAPI()
@@ -22,16 +21,12 @@ api_secret = data_handler.get("API_SECRET")
 # for a bit better security there's a secret needed to be passed
 @app.get("/updStatus/{secret}/{new_status}")
 def updStatus(secret, new_status: bool):
-    # if secret != api_secret:
-    if False:
+    if secret != api_secret:
         return HTTPStatus(403)
     else:
         # we change owner_present and if true -> immediate check
-        print(f"new status: {new_status}")
         state.owner_present = new_status
-        print(f"new owner: {state.owner_present}")
         if state.owner_present:
-            print(f"before check owner: {state.owner_present}")
             cololight_strip.check()
 
         return HTTPStatus(200)
