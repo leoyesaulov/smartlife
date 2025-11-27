@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from data_handler import DataHandler
 from fastapi  import FastAPI
+from devices import cololight_strip
 import common
 import uvicorn
 
@@ -25,7 +26,7 @@ def updStatus(secret, new_status: bool):
         # we change owner_present and if true -> immediate check
         common.owner_present = new_status
         if common.owner_present:
-            common.cololight_strip.check()
+            cololight_strip.check()
 
     return HTTPStatus(200)
 
@@ -39,7 +40,7 @@ def updStatus(secret, new_active: bool):
         # we change active and if true -> immediate check
         common.active = new_active
         if common.active:
-            common.cololight_strip.check()
+            cololight_strip.check()
 
     return HTTPStatus(200)
 

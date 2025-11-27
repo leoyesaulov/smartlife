@@ -4,7 +4,8 @@ import traceback
 from api import runApi
 from logger import log
 from asyncio import sleep
-from common import cololight_strip, active
+from common import  active
+from devices import cololight_strip
 from data_handler import DataHandler
 
 
