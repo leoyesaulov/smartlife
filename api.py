@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from data_handler import DataHandler
 from fastapi  import FastAPI
-from devices import cololight_strip
+import common
 import uvicorn
 
 app = FastAPI()
@@ -9,10 +9,8 @@ data_handler = DataHandler()
 
 # owner_present variable tracks if owner's iPhone is connected to the specific network or not
 # true -> owner connected to network, false -> owner not connected
-owner_present = False
 
 # active variable tracks if system should commit changes to real world, eg if checks have to be done
-active = True
 
 # the most secret thing you can imagine
 api_secret = data_handler.get("API_SECRET")
@@ -25,9 +23,9 @@ def updStatus(secret, new_status: bool):
         return HTTPStatus(403)
     else:
         # we change owner_present and if true -> immediate check
-        status = new_status
-        if status:
-            cololight_strip.check()
+        common.owner_present = new_status
+        if common.owner_present:
+            common.cololight_strip.check()
 
     return HTTPStatus(200)
 
@@ -39,9 +37,9 @@ def updStatus(secret, new_active: bool):
         return HTTPStatus(403)
     else:
         # we change active and if true -> immediate check
-        active = new_active
-        if active:
-            cololight_strip.check()
+        common.active = new_active
+        if common.active:
+            common.cololight_strip.check()
 
     return HTTPStatus(200)
 
