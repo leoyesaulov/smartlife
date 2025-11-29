@@ -46,59 +46,78 @@ async def listen_to_input():
         }
         
         match input_dict:
-            case {"command": "on"} as d:
-                cololight_strip.on(d["param1"])
-                timer(d["param2"])
-    
+            case {"command":"on", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                cololight_strip.on(p1)
+                if p2 != 0:
+                    timer(p2)
+
+            case {"command":"off", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                cololight_strip.off()
+                if p2 != 0:
+                    timer(int(p2))
+            
+            case {"command":"timer", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+                timer(int(p1))
+
+            case {"command":"stop", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                await kill()
+                log("All timers have been killed.", "info", __print)
+ 
+            case {"command":"city", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                if not p1:
+                    print(f"Current city is: \'{data_handler.get('CITY').capitalize()}\'")
+                else:
+                    cololight_strip.change_location_with_param(p1)
+
+            case {"command":"changeloc", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                cololight_strip.change_location()
+
+            case {"command":"state", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                cololight_strip.get_state()
+
+            case {"command":"refresh", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                cololight_strip.check()
+
+            case {"command":"help", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                __print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
+               
+            case {"command":"exit", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+
+                sys.exit(0)
+
             case _:
                 __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
 
-        if command == "off":
-            cololight_strip.off()
 
-            if param2:
-                timer(int(param2))
-            continue
-
-        if command == "timer":
-            timer(int(param1))
-            continue
-
-        if command == "stop":
-            await kill()
-            log("All timers have been killed.", "info", __print)
-            continue
-
-        if command == "city":
-            if not param1:
-                print(f"Current city is: '{data_handler.get('''CITY''').capitalize()}'")
-            else:
-                cololight_strip.change_location_with_param(param1)
-
-            continue
-
-        if command == "changeloc":
-            cololight_strip.change_location()
-            continue
-
-        if command == "state":
-            cololight_strip.get_state()
-            continue
-
-        if command == "refresh":
-            cololight_strip.check()
-            continue
-
-        if command == "help":
-            __print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
-            continue
-
-        if command == "exit":
-            sys.exit(0)
-
-        # if no if block hit
-        __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
-
+        
 def timer(duration: int):
     """
     Sets the timer of <duration> minutes.\n
