@@ -1,10 +1,10 @@
 import sys
 import asyncio
 import traceback
-
-from api import runApi, active
+from api import runApi
 from logger import log
 from asyncio import sleep
+from common import  state
 from devices import cololight_strip
 from data_handler import DataHandler
 
@@ -16,7 +16,7 @@ async def run():
     loop.set_exception_handler(exception_handler)
     while True:
         await event.wait()
-        if active:
+        if state.active:
             cololight_strip.check()
             log(f"Automated check has been performed.", "info")
         else:

@@ -1,4 +1,6 @@
 from http import HTTPStatus
+
+from common import state
 from data_handler import DataHandler
 from fastapi  import FastAPI
 from devices import cololight_strip
@@ -9,10 +11,8 @@ data_handler = DataHandler()
 
 # owner_present variable tracks if owner's iPhone is connected to the specific network or not
 # true -> owner connected to network, false -> owner not connected
-owner_present = False
 
 # active variable tracks if system should commit changes to real world, eg if checks have to be done
-active = True
 
 # the most secret thing you can imagine
 api_secret = data_handler.get("API_SECRET")
@@ -25,22 +25,22 @@ def updStatus(secret, new_status: bool):
         return HTTPStatus(403)
     else:
         # we change owner_present and if true -> immediate check
-        status = new_status
-        if status:
+        state.owner_present = new_status
+        if state.owner_present:
             cololight_strip.check()
 
-    return HTTPStatus(200)
+        return HTTPStatus(200)
 
 # active is updated through this endpoint, which accepts get-requests from (anything?)
 # for a bit better security there's a secret needed to be passed
-@app.get("/updStatus/{secret}/{new_active}")
-def updStatus(secret, new_active: bool):
+@app.get("/updActive/{secret}/{new_active}")
+def updActive(secret, new_active: bool):
     if secret != api_secret:
         return HTTPStatus(403)
     else:
         # we change active and if true -> immediate check
-        active = new_active
-        if active:
+        state.active = new_active
+        if state.active:
             cololight_strip.check()
 
     return HTTPStatus(200)
