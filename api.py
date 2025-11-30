@@ -1,5 +1,4 @@
 from http import HTTPStatus
-
 from common import state
 from data_handler import DataHandler
 from fastapi  import FastAPI
