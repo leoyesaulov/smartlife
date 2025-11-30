@@ -24,11 +24,9 @@ def updStatus(secret, new_status: bool):
     if secret != api_secret:
         return HTTPStatus(403)
     else:
-        # we change owner_present and if true -> immediate check
+        # we change owner_present and immediate check
         state.owner_present = new_status
-        if state.owner_present:
-            cololight_strip.check()
-
+        cololight_strip.check()
         return HTTPStatus(200)
 
 # active is updated through this endpoint, which accepts get-requests from (anything?)
@@ -42,8 +40,7 @@ def updActive(secret, new_active: bool):
         state.active = new_active
         if state.active:
             cololight_strip.check()
-
-    return HTTPStatus(200)
+        return HTTPStatus(200)
 
 async def runApi():
     config = uvicorn.Config(app, port=5002)
