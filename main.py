@@ -34,7 +34,7 @@ async def listen_to_input():
         user_input = await loop.run_in_executor(None, input, "\r>>> ")
         log(f"User input: {user_input}", "info")
 
-        parser.parse_args(user_input.split())
+        input_arr = user_input.lower().split()
 
         # padding the list
         input_arr = input_arr + [0] * (3 - len(input_arr))
@@ -60,7 +60,7 @@ async def listen_to_input():
 
                 cololight_strip.off()
                 if p2 != 0:
-                    timer(int(p2))
+                    timer(p2)
             
             case {"command":"timer", "param1":p1, "param2":p2}:
                 p1: int
@@ -78,7 +78,7 @@ async def listen_to_input():
                 p1: int
                 p2: int
 
-                if not p1:
+                if p1 != 0:
                     print(f"Current city is: \'{data_handler.get('CITY').capitalize()}\'")
                 else:
                     cololight_strip.change_location_with_param(p1)
