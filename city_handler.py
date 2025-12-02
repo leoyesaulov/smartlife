@@ -60,7 +60,6 @@ class CityHandler:
     def str_to_loc(
             self, 
             city: str, 
-            username: str = "smartlife"
     ) -> Location:
         """
         Parse city name to Location object
@@ -69,7 +68,7 @@ class CityHandler:
         :raises:
             - ValueError: if location could not be inferred
         """
-        geonames = GeoNames(username)
+        geonames = GeoNames(self.username)
         res = geonames.geocode(city)
         
         if not res:
@@ -82,7 +81,6 @@ class CityHandler:
     def split_location(
         self,
         loc: Location,
-        username: str = "smartlife"
     ) -> Dict[str, Union[Observer, timezone]]:
         pass
         """
@@ -97,7 +95,7 @@ class CityHandler:
         res: Dict[str, Union[Observer, timezone]] = {"observer": None, "timezone": None}
 
         coordinates = loc.point
-        gmt_offset = GeoNames(username).reverse_timezone(coordinates).raw["gmtOffset"]
+        gmt_offset = GeoNames(self.username).reverse_timezone(coordinates).raw["gmtOffset"]
         tz = timezone(timedelta(hours=gmt_offset))
         res.update({"timezone": tz})
 
@@ -111,7 +109,6 @@ class CityHandler:
     def get_user_location(
             self, 
             preset_loc: str | None = None, 
-            username: str = "smartlife"
     ) -> Tuple[
         Dict[str, Union[Observer, timezone]], 
         str
@@ -133,7 +130,7 @@ class CityHandler:
 
             if not usr_input: continue
 
-            res = self.split_location(usr_input, username=username)
+            res = self.split_location(usr_input)
             if res: break
 
             print(f"City '{usr_input}' could not be found, try a different one.")
