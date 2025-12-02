@@ -15,20 +15,21 @@ from warnings import warn
 
 
 
-class CityHandler:
+class CityHandler(DataHandler):
     """
     CityHandler class is reponsible for everything related to user location.\n
     Avaialable attributes are:\n
         - username: ...
-        - data_handler: DataHandler object
     
     Available methods are:
-    - 
+        - 
 
     """
     def __init__(self, username: str = "smartlife") -> None:
+        from dotenv import load_dotenv, find_dotenv, set_key, get_key
+        super().__init__()
+
         self.username = username
-        self.data_handler = DataHandler()
 
     
     def change_city(
@@ -36,8 +37,7 @@ class CityHandler:
             city: str
     ) -> Dict[str, Union[Observer, timezone]] | None:
         """
-        Parses new city\n
-        Writes it with DataHandler instance\n
+        Parses new city & commits the change to .env
 
         :Params:
             - city: user's city
@@ -48,16 +48,16 @@ class CityHandler:
         :raises:
             - ValueError: if the city is invalid
         """
-        res = self.str_to_loc(city)
+        res = self.parse_location(city)
         if not res:
             raise ValueError(f"The city '{city}' is invalid")
 
         loc = self.split_location(res)
-        self.data_handler.write(key="CITY", value=city)
+        self.write(key="CITY", value=city)
         return loc
 
 
-    def str_to_loc(
+    def parse_location(
             self, 
             city: str, 
     ) -> Location:
@@ -130,12 +130,12 @@ class CityHandler:
 
             if not usr_input: continue
 
-            res = self.split_location(usr_input)
+            res = self.parse_location(usr_input)
             if res: break
 
             print(f"City '{usr_input}' could not be found, try a different one.")
         # TODO
-        return self.res_to_loc(res), usr_input
+        return self.split_location(res), usr_input
 
 
     # Deprecated functions
@@ -160,11 +160,11 @@ class CityHandler:
         """
         warn(
             "This function is deprecated, "
-            "use self.get_user_location + self.data_handler.write separately or self.change_city"
+            "use self.get_user_location + self.write separately or self.change_city"
         )
 
-        user_loc, user_inp = self.get_user_location(preset_loc=preset_loc, username=self.username)
-        self.data_handler.write("CITY", user_inp)
+        user_loc, user_inp = self.get_user_location(preset_loc=preset_loc)
+        self.write("CITY", user_inp)
         return user_loc, user_inp
 
 
