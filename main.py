@@ -8,8 +8,6 @@ from common import  state
 from devices import cololight_strip
 from data_handler import DataHandler
 
-# import argparse
-
 
 async def run():
     loop = asyncio.get_event_loop()
@@ -27,9 +25,6 @@ async def run():
 async def listen_to_input():
     loop = asyncio.get_event_loop()
 
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument()...
-
     while True:
         user_input = await loop.run_in_executor(None, input, "\r>>> ")
         log(f"User input: {user_input}", "info")
@@ -41,9 +36,7 @@ async def listen_to_input():
 
         input_dict = {
             "command": input_arr[0],
-            # for 'on' command the default value should be 25, not 0.
-            # If brightness 0 is wanted - command 'off' covers for that.
-            "param1": 25 if input_arr[0] == 'on' and input_arr[1] == 0 else input_arr[1],
+            "param1": input_arr[1],
             "param2": input_arr[2]
         }
         
@@ -52,7 +45,8 @@ async def listen_to_input():
                 p1: int
                 p2: int
 
-                cololight_strip.on(p1)
+                # default brightness should be 25
+                cololight_strip.on(25 if p1 == 0 else p1)
                 if p2 != 0:
                     timer(p2)
 
