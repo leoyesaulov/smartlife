@@ -22,88 +22,98 @@ async def run():
         await sleep(600)
 
 
-def parse(arr):
-    out = {
-        "command": arr[0],
-        "param1": '25' if arr[0] == 'on' and arr[1] == 0 else arr[1],
-        "param2": arr[2]
-    }
-    return out
-
-
 async def listen_to_input():
     loop = asyncio.get_event_loop()
+
     while True:
         user_input = await loop.run_in_executor(None, input, "\r>>> ")
         log(f"User input: {user_input}", "info")
+
         input_arr = user_input.lower().split()
 
         # padding the list
         input_arr = input_arr + [0] * (3 - len(input_arr))
 
-        input_dict = parse(input_arr)
+        input_dict = {
+            "command": input_arr[0],
+            "param1": input_arr[1],
+            "param2": input_arr[2]
+        }
+        
+        match input_dict:
+            case {"command":"on", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-        # Command specification
-        command = input_dict['command']
-        # First parameter: brightness for on/off commands, duration for timer, desired city for city
-        param1 = input_dict['param1']
-        # Second parameter: timer for on/off commands
-        param2 = input_dict['param2']
+                # default brightness should be 25
+                cololight_strip.on(25 if p1 == 0 else p1)
+                if p2 != 0:
+                    timer(p2)
 
-        if command == "on":
-            cololight_strip.on(int(param1))
+            case {"command":"off", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-            if param2:
-                timer(int(param2))
+                cololight_strip.off()
+                if p2 != 0:
+                    timer(p2)
+            
+            case {"command":"timer", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
+                timer(int(p1))
 
-            continue
+            case {"command":"stop", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-        if command == "off":
-            cololight_strip.off()
+                await kill()
+                log("All timers have been killed.", "info", __print)
+ 
+            case {"command":"city", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-            if param2:
-                timer(int(param2))
-            continue
+                if p1 != 0:
+                    print(f"Current city is: \'{data_handler.get('CITY').capitalize()}\'")
+                else:
+                    cololight_strip.change_location_with_param(p1)
 
-        if command == "timer":
-            timer(int(param1))
-            continue
+            case {"command":"changeloc", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-        if command == "stop":
-            await kill()
-            log("All timers have been killed.", "info", __print)
-            continue
+                cololight_strip.change_location()
 
-        if command == "city":
-            if not param1:
-                print(f"Current city is: '{data_handler.get('''CITY''').capitalize()}'")
-            else:
-                cololight_strip.change_location_with_param(param1)
+            case {"command":"state", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-            continue
+                cololight_strip.get_state()
 
-        if command == "changeloc":
-            cololight_strip.change_location()
-            continue
+            case {"command":"refresh", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-        if command == "state":
-            cololight_strip.get_state()
-            continue
+                cololight_strip.check()
 
-        if command == "refresh":
-            cololight_strip.check()
-            continue
+            case {"command":"help", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-        if command == "help":
-            __print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
-            continue
+                __print("Available commands are: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'help', 'exit'.")
+               
+            case {"command":"exit", "param1":p1, "param2":p2}:
+                p1: int
+                p2: int
 
-        if command == "exit":
-            sys.exit(0)
+                sys.exit(0)
 
-        # if no if block hit
-        __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
+            case _:
+                __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
 
+
+        
 def timer(duration: int):
     """
     Sets the timer of <duration> minutes.\n
