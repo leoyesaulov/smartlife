@@ -81,16 +81,16 @@ class ColoStrip:
         self.strip.state()
         sunset = sun(self.city)["sunset"].astimezone(self.city_tz)
         now = datetime.now().astimezone(self.city_tz)
-        bed_time = now.replace(hour=22, minute=30, second=0, microsecond=0)
-        wake_time = now.replace(hour=8, minute=0, second=0, microsecond=0)
+        bed_time = now.replace(hour=21, minute=30, second=0, microsecond=0)
+        wake_time = now.replace(hour=7, minute=0, second=0, microsecond=0)
 
         # owner_present: true if owner connected to home network, false otherwise
         # if not home - turn off. If home and otherwise approved - turn on
         # why checking for strip status? it may fail... idk man
-        # turn on 30minutes before sunset for smooth transition and if before bedtime
+        # turn on 30minutes before sunset and if before bedtime for smooth transition
         if (now >= sunset - timedelta(minutes=30) and not any([self.strip.on, now >= bed_time])) and state.owner_present:
             self.on()
-        # turn off during the sleep-time (from 22:30 to 08:00)
+        # turn off during the sleep-time (from 21:30 to 07:00)
         if ((now >= bed_time or now <= wake_time) and self.strip.on) or not state.owner_present:
             self.off()
 
