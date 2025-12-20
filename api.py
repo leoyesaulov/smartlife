@@ -4,6 +4,7 @@ from data_handler import DataHandler
 from fastapi  import FastAPI
 from devices import cololight_strip
 import uvicorn
+from pydantic import BaseModel
 
 app = FastAPI()
 data_handler = DataHandler()
@@ -16,27 +17,33 @@ data_handler = DataHandler()
 # the most secret thing you can imagine
 api_secret = data_handler.get("API_SECRET")
 
+# pydantic class for status and active variable change apis to sanitize input
+class BoolUpdateRequestModel(BaseModel):
+    secret: str
+    new_value: bool
+
+
 # owner_present is updated through this endpoint, which accepts get-requests from iPhone automatisations
 # for a bit better security there's a secret needed to be passed
 @app.get("/updStatus/{secret}/{new_status}")
-def updStatus(secret, new_status: bool):
-    if secret != api_secret:
+def updStatus(request: BoolUpdateRequestModel):
+    if request.secret != api_secret:
         return HTTPStatus(403)
     else:
         # we change owner_present and immediate check
-        state.owner_present = new_status
+        state.owner_present = request.new_value
         cololight_strip.check()
         return HTTPStatus(200)
 
 # active is updated through this endpoint, which accepts get-requests from (anything?)
 # for a bit better security there's a secret needed to be passed
 @app.get("/updActive/{secret}/{new_active}")
-def updActive(secret, new_active: bool):
-    if secret != api_secret:
+def updActive(request: BoolUpdateRequestModel):
+    if request.secret != api_secret:
         return HTTPStatus(403)
     else:
         # we change active and if true -> immediate check
-        state.active = new_active
+        state.active = request.new_value
         if state.active:
             cololight_strip.check()
         return HTTPStatus(200)
