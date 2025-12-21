@@ -25,7 +25,7 @@ class BoolUpdateRequestModel(BaseModel):
 
 # owner_present is updated through this endpoint, which accepts get-requests from iPhone automatisations
 # for a bit better security there's a secret needed to be passed
-@app.get("/updStatus/{secret}/{new_status}")
+@app.get("/updStatus/request")
 def updStatus(request: BoolUpdateRequestModel):
     if request.secret != api_secret:
         return HTTPStatus(403)
@@ -37,7 +37,7 @@ def updStatus(request: BoolUpdateRequestModel):
 
 # active is updated through this endpoint, which accepts get-requests from (anything?)
 # for a bit better security there's a secret needed to be passed
-@app.get("/updActive/{secret}/{new_active}")
+@app.get("/updActive/request")
 def updActive(request: BoolUpdateRequestModel):
     if request.secret != api_secret:
         return HTTPStatus(403)
