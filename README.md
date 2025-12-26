@@ -38,3 +38,5 @@ Usage:
 
 ### Unix-like:
 - Coming soon!
+
+Part of Omniserv
