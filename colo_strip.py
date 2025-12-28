@@ -85,7 +85,7 @@ class ColoStrip:
         wake_time = now.replace(hour=7, minute=0, second=0, microsecond=0)
 
         # owner_present: true if owner connected to home network, false otherwise
-        # if not home - turn off. If home and otherwise approved - turn on
+        # if not home -refre turn off. If home and otherwise approved - turn on
         # why checking for strip status? it may fail... idk man
         # turn on 30minutes before sunset and if before bedtime for smooth transition
         if (now >= sunset - timedelta(minutes=30) and not any([self.strip.on, now >= bed_time])) and state.owner_present:

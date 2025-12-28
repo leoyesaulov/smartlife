@@ -48,6 +48,30 @@ def updActive(request: BoolUpdateRequestModel):
             cololight_strip.check()
         return HTTPStatus(200)
 
+# Doubled as get requests because apple automatisation app malfunctions
+@app.get("/updStatus/{secret}/{new_status}")
+def updStatus(secret, new_status: bool):
+    if secret != api_secret:
+        return HTTPStatus(403)
+    else:
+        # we change owner_present and immediate check
+        state.owner_present = new_status
+        cololight_strip.check()
+        return HTTPStatus(200)
+
+# active is updated through this endpoint, which accepts get-requests from (anything?)
+# for a bit better security there's a secret needed to be passed
+@app.get("/updActive/{secret}/{new_active}")
+def updActive(secret, new_active: bool):
+    if secret != api_secret:
+        return HTTPStatus(403)
+    else:
+        # we change active and if true -> immediate check
+        state.active = new_active
+        if state.active:
+            cololight_strip.check()
+        return HTTPStatus(200)
+
 async def runApi():
     config = uvicorn.Config(app, port=5002)
     server = uvicorn.Server(config)
