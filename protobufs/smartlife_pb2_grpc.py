@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import smartlife_pb2 as smartlife__pb2
+from protobufs import smartlife_pb2 as protobufs_dot_smartlife__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in smartlife_pb2_grpc.py depends on'
+        + ' but the generated code in protobufs/smartlife_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,18 +36,18 @@ class StateUpdateStub(object):
         """
         self.StatusUpdate = channel.unary_unary(
                 '/smartlife.StateUpdate/StatusUpdate',
-                request_serializer=smartlife__pb2.StatusRequest.SerializeToString,
-                response_deserializer=smartlife__pb2.UpdateResponse.FromString,
+                request_serializer=protobufs_dot_smartlife__pb2.StatusRequest.SerializeToString,
+                response_deserializer=protobufs_dot_smartlife__pb2.UpdateResponse.FromString,
                 _registered_method=True)
         self.ActiveUpdate = channel.unary_unary(
                 '/smartlife.StateUpdate/ActiveUpdate',
-                request_serializer=smartlife__pb2.ActiveRequest.SerializeToString,
-                response_deserializer=smartlife__pb2.UpdateResponse.FromString,
+                request_serializer=protobufs_dot_smartlife__pb2.ActiveRequest.SerializeToString,
+                response_deserializer=protobufs_dot_smartlife__pb2.UpdateResponse.FromString,
                 _registered_method=True)
         self.BrightnessUpdate = channel.unary_unary(
                 '/smartlife.StateUpdate/BrightnessUpdate',
-                request_serializer=smartlife__pb2.BrightnessRequest.SerializeToString,
-                response_deserializer=smartlife__pb2.UpdateResponse.FromString,
+                request_serializer=protobufs_dot_smartlife__pb2.BrightnessRequest.SerializeToString,
+                response_deserializer=protobufs_dot_smartlife__pb2.UpdateResponse.FromString,
                 _registered_method=True)
 
 
@@ -77,18 +77,18 @@ def add_StateUpdateServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'StatusUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.StatusUpdate,
-                    request_deserializer=smartlife__pb2.StatusRequest.FromString,
-                    response_serializer=smartlife__pb2.UpdateResponse.SerializeToString,
+                    request_deserializer=protobufs_dot_smartlife__pb2.StatusRequest.FromString,
+                    response_serializer=protobufs_dot_smartlife__pb2.UpdateResponse.SerializeToString,
             ),
             'ActiveUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.ActiveUpdate,
-                    request_deserializer=smartlife__pb2.ActiveRequest.FromString,
-                    response_serializer=smartlife__pb2.UpdateResponse.SerializeToString,
+                    request_deserializer=protobufs_dot_smartlife__pb2.ActiveRequest.FromString,
+                    response_serializer=protobufs_dot_smartlife__pb2.UpdateResponse.SerializeToString,
             ),
             'BrightnessUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.BrightnessUpdate,
-                    request_deserializer=smartlife__pb2.BrightnessRequest.FromString,
-                    response_serializer=smartlife__pb2.UpdateResponse.SerializeToString,
+                    request_deserializer=protobufs_dot_smartlife__pb2.BrightnessRequest.FromString,
+                    response_serializer=protobufs_dot_smartlife__pb2.UpdateResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -116,8 +116,8 @@ class StateUpdate(object):
             request,
             target,
             '/smartlife.StateUpdate/StatusUpdate',
-            smartlife__pb2.StatusRequest.SerializeToString,
-            smartlife__pb2.UpdateResponse.FromString,
+            protobufs_dot_smartlife__pb2.StatusRequest.SerializeToString,
+            protobufs_dot_smartlife__pb2.UpdateResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -143,8 +143,8 @@ class StateUpdate(object):
             request,
             target,
             '/smartlife.StateUpdate/ActiveUpdate',
-            smartlife__pb2.ActiveRequest.SerializeToString,
-            smartlife__pb2.UpdateResponse.FromString,
+            protobufs_dot_smartlife__pb2.ActiveRequest.SerializeToString,
+            protobufs_dot_smartlife__pb2.UpdateResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -170,8 +170,8 @@ class StateUpdate(object):
             request,
             target,
             '/smartlife.StateUpdate/BrightnessUpdate',
-            smartlife__pb2.BrightnessRequest.SerializeToString,
-            smartlife__pb2.UpdateResponse.FromString,
+            protobufs_dot_smartlife__pb2.BrightnessRequest.SerializeToString,
+            protobufs_dot_smartlife__pb2.UpdateResponse.FromString,
             options,
             channel_credentials,
             insecure,
