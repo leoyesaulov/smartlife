@@ -1,0 +1,24 @@
+syntax = "proto3";
+package smartlife;
+
+message StatusRequest {
+  bool status = 1;
+}
+
+message ActiveRequest {
+  bool active = 1;
+}
+
+message BrightnessRequest {
+  int32 brightness = 1;
+}
+
+message UpdateResponse {
+  bool success = 1;
+}
+
+service StateUpdate {
+  rpc StatusUpdate (StatusRequest) returns (UpdateResponse);
+  rpc ActiveUpdate (ActiveRequest) returns (UpdateResponse);
+  rpc BrightnessUpdate (BrightnessRequest) returns (UpdateResponse);
+}

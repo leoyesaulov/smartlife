@@ -94,6 +94,13 @@ class ColoStrip:
         if ((now >= bed_time or now <= wake_time) and self.strip.on) or not state.owner_present:
             self.off()
 
+    # An interface tp on/off methods to decide which method (and logging) to use
+    def updBrightness(self, brightness):
+        if brightness:
+            self.on(brightness)
+        else:
+            self.off()
+
     def on(self, brightness=25):
         self.strip.state()
         log(f"Turning lights on with previous brightness: {self.strip.brightness}.", "info", _print)
