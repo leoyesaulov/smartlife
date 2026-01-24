@@ -1,78 +1,53 @@
-from http import HTTPStatus
+import grpc
 from common import state
-from data_handler import DataHandler
-from fastapi  import FastAPI
+from concurrent import futures
 from devices import cololight_strip
-import uvicorn
-from pydantic import BaseModel
+from data_handler import DataHandler
+from protobufs import smartlife_pb2, smartlife_pb2_grpc
 
-app = FastAPI()
 data_handler = DataHandler()
+RPC_PORT = "5002"
+
+class StatusUpdateServicer(smartlife_pb2_grpc.StateUpdateServicer):
+    def StatusUpdate(self, request, context):
+        updStatus(request.status)
+        return smartlife_pb2.UpdateResponse(success=True)
+
+    def ActiveUpdate(self, request, context):
+        updActive(request.active)
+        return smartlife_pb2.UpdateResponse(success=True)
+
+    def BrightnessUpdate(self, request, context):
+        updBrightness(request.brightness)
+        return smartlife_pb2.UpdateResponse(success=True)
 
 # owner_present variable tracks if owner's iPhone is connected to the specific network or not
 # true -> owner connected to network, false -> owner not connected
 
 # active variable tracks if system should commit changes to real world, eg if checks have to be done
 
-# the most secret thing you can imagine
-api_secret = data_handler.get("API_SECRET")
+# ToDo: refactor status variable naming
+def updStatus(new_status: bool):
+    # we change owner_present and immediate check
+    state.owner_present = new_status
+    cololight_strip.check()
 
-# pydantic class for status and active variable change apis to sanitize input
-class BoolUpdateRequestModel(BaseModel):
-    secret: str
-    new_value: bool
-
-
-# owner_present is updated through this endpoint, which accepts get-requests from iPhone automatisations
-# for a bit better security there's a secret needed to be passed
-@app.post("/updStatus/")
-def updStatus(request: BoolUpdateRequestModel):
-    if request.secret != api_secret:
-        return HTTPStatus(403)
-    else:
-        # we change owner_present and immediate check
-        state.owner_present = request.new_value
+def updActive(new_active: bool):
+    # we change active and if true -> immediate check
+    state.active = new_active
+    if state.active:
         cololight_strip.check()
-        return HTTPStatus(200)
 
-# active is updated through this endpoint, which accepts get-requests from (anything?)
-# for a bit better security there's a secret needed to be passed
-@app.post("/updActive/")
-def updActive(request: BoolUpdateRequestModel):
-    if request.secret != api_secret:
-        return HTTPStatus(403)
-    else:
-        # we change active and if true -> immediate check
-        state.active = request.new_value
-        if state.active:
-            cololight_strip.check()
-        return HTTPStatus(200)
-
-# Doubled as get requests because apple automatisation app malfunctions
-@app.get("/updStatus/{secret}/{new_status}")
-def updStatus(secret, new_status: bool):
-    if secret != api_secret:
-        return HTTPStatus(403)
-    else:
-        # we change owner_present and immediate check
-        state.owner_present = new_status
-        cololight_strip.check()
-        return HTTPStatus(200)
-
-# active is updated through this endpoint, which accepts get-requests from (anything?)
-# for a bit better security there's a secret needed to be passed
-@app.get("/updActive/{secret}/{new_active}")
-def updActive(secret, new_active: bool):
-    if secret != api_secret:
-        return HTTPStatus(403)
-    else:
-        # we change active and if true -> immediate check
-        state.active = new_active
-        if state.active:
-            cololight_strip.check()
-        return HTTPStatus(200)
+def updBrightness(new_brightness: int):
+    cololight_strip.updBrightness(new_brightness)
 
 async def runApi():
-    config = uvicorn.Config(app, port=5002)
-    server = uvicorn.Server(config)
-    await server.serve()
+    rpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
+    smartlife_pb2_grpc.add_StateUpdateServicer_to_server(
+        servicer=StatusUpdateServicer(),
+        server=rpc_server
+    )
+    rpc_server.add_insecure_port(f"localhost:{RPC_PORT}")
+    rpc_server.start()
+    print(f"RPC server listening on port :{RPC_PORT}")
+    await rpc_server.wait_for_termination()
