@@ -14,7 +14,7 @@ async def run():
     loop.set_exception_handler(exception_handler)
     while True:
         await event.wait()
-        if state.active:
+        if state.service_active:
             cololight_strip.check()
             log(f"Automated check has been performed.", "info")
         else:

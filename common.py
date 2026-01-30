@@ -4,7 +4,7 @@ class State:
     # true -> owner connected to network, false -> owner not connected
     owner_present = False
 
-    # active variable tracks if system should commit changes to real world, eg if checks have to be done
-    active = True
+    # service_active variable tracks if system should commit changes to real world, eg if checks have to be done
+    service_active = True
 
 state = State()

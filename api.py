@@ -14,7 +14,7 @@ class StatusUpdateServicer(smartlife_pb2_grpc.StateUpdateServicer):
         return smartlife_pb2.UpdateResponse(success=True)
 
     def ActiveUpdate(self, request, context):
-        updActive(request.active)
+        updActive(request.service_active)
         return smartlife_pb2.UpdateResponse(success=True)
 
     def BrightnessUpdate(self, request, context):
@@ -34,8 +34,8 @@ def updStatus(new_status: bool):
 
 def updActive(new_active: bool):
     # we change active and if true -> immediate check
-    state.active = new_active
-    if state.active:
+    state.service_active = new_active
+    if state.service_active:
         cololight_strip.check()
 
 def updBrightness(new_brightness: int):
