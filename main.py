@@ -1,6 +1,8 @@
 import sys
 import asyncio
 import traceback
+
+import common
 from api import runApi
 from logger import log
 from asyncio import sleep
@@ -108,6 +110,9 @@ async def listen_to_input():
                 p2: int
 
                 sys.exit(0)
+
+            case {"command":"status", "param1":p1, "param2":p2}:
+                print(f"Current service status: owner_present: {common.state.owner_present}, service_active: {common.state.service_active}")
 
             case _:
                 __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")
