@@ -23,7 +23,7 @@ async def run():
             log(f"Inactive. Sleeping through the check", "info")
         await sleep(600)
 
-
+# Todo: the script seems to ignore cli inputs???
 async def listen_to_input():
     loop = asyncio.get_event_loop()
 

@@ -14,7 +14,7 @@ class StatusUpdateServicer(smartlife_pb2_grpc.StateUpdateServicer):
         return smartlife_pb2.UpdateResponse(success=True)
 
     def ActiveUpdate(self, request, context):
-        updActive(request.service_active)
+        updActive(request.active)
         return smartlife_pb2.UpdateResponse(success=True)
 
     def BrightnessUpdate(self, request, context):
