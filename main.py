@@ -15,6 +15,7 @@ async def run():
     loop = asyncio.get_event_loop()
     loop.set_exception_handler(exception_handler)
     while True:
+        print("waiting for timer event")
         await event.wait()
         if state.service_active:
             cololight_strip.check()
