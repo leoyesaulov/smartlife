@@ -17,6 +17,7 @@ async def run():
     while True:
         print("waiting for timer event")
         await event.wait()
+        print("got timer event")
         if state.service_active:
             cololight_strip.check()
             log(f"Automated check has been performed.", "info")
