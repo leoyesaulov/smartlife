@@ -20,9 +20,9 @@ async def run():
         print("got timer event")
         if state.service_active:
             cololight_strip.check()
-            log(f"Automated check has been performed.", "info")
+            log(f"Automated check has been performed.", "info", __print)
         else:
-            log(f"Inactive. Sleeping through the check", "info")
+            log(f"Inactive. Sleeping through the check", "info", __print)
         await sleep(600)
 
 # Todo: the script seems to ignore cli inputs???
