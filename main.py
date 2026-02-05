@@ -23,7 +23,7 @@ async def run():
             log(f"Automated check has been performed.", "info", __print)
         else:
             log(f"Inactive. Sleeping through the check", "info", __print)
-        await sleep(600)
+        # await sleep(600)
 
 # Todo: the script seems to ignore cli inputs???
 async def listen_to_input():
