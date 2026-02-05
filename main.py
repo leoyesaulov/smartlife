@@ -23,7 +23,7 @@ async def run():
             log(f"Automated check has been performed.", "info", __print)
         else:
             log(f"Inactive. Sleeping through the check", "info", __print)
-        # await sleep(600)
+        await sleep(5)
 
 # Todo: the script seems to ignore cli inputs???
 async def listen_to_input():
@@ -176,7 +176,7 @@ def exception_handler(loop, context):
     exception = context.get("exception")
     message = context.get("message")
     if type(exception) is not SystemExit:
-        log(f"async exception has been raised: {exception} with message: {message}", "error")
+        log(f"async exception has been raised: {exception} with message: {message}", "error", __print)
 
 
 def get_from_db(id):
