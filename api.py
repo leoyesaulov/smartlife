@@ -41,7 +41,7 @@ def updActive(new_active: bool):
 def updBrightness(new_brightness: int):
     cololight_strip.updBrightness(new_brightness)
 
-async def runApi():
+def runApi():
     rpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
     smartlife_pb2_grpc.add_StateUpdateServicer_to_server(
         servicer=StatusUpdateServicer(),
@@ -50,4 +50,4 @@ async def runApi():
     rpc_server.add_insecure_port(f"localhost:{RPC_PORT}")
     rpc_server.start()
     print(f"RPC server listening on port :{RPC_PORT}")
-    await rpc_server.wait_for_termination()
+    rpc_server.wait_for_termination()

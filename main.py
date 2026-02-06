@@ -1,22 +1,23 @@
 import sys
-import asyncio
 import traceback
+
+import time
+import threading
 
 import common
 from api import runApi
 from logger import log
-from asyncio import sleep
 from common import  state
 from devices import cololight_strip
 from data_handler import DataHandler
 
 
-async def run():
-    loop = asyncio.get_event_loop()
-    loop.set_exception_handler(exception_handler)
+# ToDo: ensure correct concurrency, clean up and test
+
+def run_checks():
     while True:
         print("waiting for timer event")
-        await event.wait()
+        wait_for_timers()
         print("got timer event")
         if state.service_active:
             cololight_strip.check()
@@ -24,16 +25,19 @@ async def run():
         else:
             log(f"Inactive. Sleeping through the check", "info", __print)
         print("Entering sleep")
-        await sleep(1) # ToDo: it fails to wake up wtf???
+        time.sleep(5)
         print("Awakening")
 
+def wait_for_timers():
+    while len(sleeping_queue) > 0:
+        thread = sleeping_queue[0]
+        thread.join()
+        sleeping_queue.remove(thread)
 
 # Todo: the script seems to ignore cli inputs???
-async def listen_to_input():
-    loop = asyncio.get_event_loop()
-
+def listen_to_input():
     while True:
-        user_input = await loop.run_in_executor(None, input, "\r>>> ")
+        user_input = input("\r>>> ")
         log(f"User input: {user_input}", "info")
 
         input_arr = user_input.lower().split()
@@ -74,7 +78,7 @@ async def listen_to_input():
                 p1: int
                 p2: int
 
-                await kill()
+                kill()
                 log("All timers have been killed.", "info", __print)
  
             case {"command":"city", "param1":p1, "param2":p2}:
@@ -133,46 +137,41 @@ def timer(duration: int):
     """
     if duration >= 0:
         log(f"Timer of {duration} minutes has been set.", "info", __print)
-        extra_tasks.append(asyncio.create_task(wait(int(duration) * 60)))
+        sleeping_thread = threading.Thread(target=wait(int(duration) * 60))
+        sleeping_queue.append(sleeping_thread)
+        sleeping_thread.start()
     else:
         log(f"Duration of {duration} minutes is invalid for timer function", "error", __print)
 
 
-async def wait(seconds):
-    await enter()
-    await asyncio.sleep(seconds)
+def wait(seconds):
+    time.sleep(seconds)
     log(f"Wait complete.",  "info", __print)
-    await release()
 
 
-async def enter():
+# sidenote: wtf was I thinking goddamnit
+# async def enter():
+#     global semaphore
+#     async with lock:
+#         semaphore += 1
+#     event.clear()
+#
+#
+# async def release():
+#     global semaphore
+#     async with lock:
+#         semaphore -= 1
+#         if semaphore <= 0:
+#             event.set()
+
+
+def kill():
+    global sleeping_queue
     global semaphore
-    async with lock:
-        semaphore += 1
-    event.clear()
+    sleeping_queue.clear()
 
-
-async def release():
-    global semaphore
-    async with lock:
-        semaphore -= 1
-        if semaphore <= 0:
-            event.set()
-
-
-async def kill():
-    global extra_tasks
-    global semaphore
-    async with lock:
-        for task in extra_tasks:
-            task.cancel()
-        semaphore = 0
-        event.set()
-
-
-async def main():
-    event.set()
-    await asyncio.gather(run(), listen_to_input(), runApi())
+    # semaphore = 0
+    # event.set()
 
 
 def exception_handler(loop, context):
@@ -182,34 +181,38 @@ def exception_handler(loop, context):
         log(f"async exception has been raised: {exception} with message: {message}", "error", __print)
 
 
-def get_from_db(id):
-    pass
-
-
-def put_to_db(id, value):
-    pass
-
-
-def init_db():
-    pass
-
-
 def __print(msg: str) -> None:
     print(f"\r{msg}", flush=True)
     print(">>> ", end="", flush=True)
 
+# ToDO add proper logging
 if __name__ == "__main__":
     device_counter = 0
     devices = {}
-    event = asyncio.Event()
-    semaphore = 0
-    lock = asyncio.Lock()
-    extra_tasks = []
+    semaphore = threading.Semaphore()
+    sleeping_queue = []
     data_handler = DataHandler()
 
     try:
         log("Starting the application.", "info", __print)
-        asyncio.run(main())
+        checking_thread = threading.Thread(target=run_checks())
+        checking_thread.start()
+
+        log("Checking thread started.", "info", __print)
+
+        cli_thread = threading.Thread(target=listen_to_input())
+        cli_thread.start()
+
+        log("CLI thread started.", "info", __print)
+
+        api_thread = threading.Thread(target=runApi())
+        api_thread.start()
+
+        log("API thread started.", "info", __print)
+
+        checking_thread.join()
+        cli_thread.join()
+        api_thread.join()
     except SystemExit as e:
         print("\rExiting peacefully...", flush=True)
     except KeyboardInterrupt:
