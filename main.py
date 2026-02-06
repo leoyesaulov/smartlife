@@ -24,7 +24,7 @@ async def run():
         else:
             log(f"Inactive. Sleeping through the check", "info", __print)
         print("Entering sleep")
-        await sleep(5) # ToDo: it fails to wake up wtf???
+        await sleep(1) # ToDo: it fails to wake up wtf???
         print("Awakening")
 
 
