@@ -3,6 +3,7 @@ import traceback
 
 import time
 import threading
+import multiprocessing
 
 import common
 from api import runApi
@@ -191,10 +192,10 @@ if __name__ == "__main__":
 
     try:
         log("Starting the application.", "info", __print)
-        checking_thread = threading.Thread(target=run_checks())
-        checking_thread.start()
-
-        log("Checking thread started.", "info", __print)
+        # checking_thread = threading.Thread(target=run_checks())
+        # checking_thread.start()
+        #
+        # log("Checking thread started.", "info", __print)
 
         cli_thread = threading.Thread(target=listen_to_input())
         cli_thread.start()
