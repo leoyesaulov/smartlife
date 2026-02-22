@@ -1,0 +1,11 @@
+i lowkey want to rewrite this project with c, bc python delivers too much of a headache with threading
+
+ToDo:
+implement basic functionality first, expand later
+basics: check thread, api thread
+advanced: cli, timers, logging
+
+Notes:
+Calculate sunset: https://edwilliams.org/sunrise_sunset_algorithm.htm
+Call python: https://www.askpython.com/python/examples/calling-python-scripts-from-c
+gRPC: https://stackoverflow.com/questions/50953651/how-to-write-a-grpc-client-server-in-c
