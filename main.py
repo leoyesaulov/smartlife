@@ -22,7 +22,7 @@ def run_checks():
             log(f"Automated check has been performed.", "info", __print)
         else:
             log(f"Inactive. Sleeping through the check", "info", __print)
-        time.sleep(5)
+        time.sleep(600)
 
 def wait_for_timers():
     while len(sleeping_queue) > 0:
