@@ -16,17 +16,13 @@ from data_handler import DataHandler
 
 def run_checks():
     while True:
-        print("waiting for timer event")
         wait_for_timers()
-        print("got timer event")
         if state.service_active:
             cololight_strip.check()
             log(f"Automated check has been performed.", "info", __print)
         else:
             log(f"Inactive. Sleeping through the check", "info", __print)
-        print("Entering sleep")
         time.sleep(5)
-        print("Awakening")
 
 def wait_for_timers():
     while len(sleeping_queue) > 0:
