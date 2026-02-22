@@ -197,17 +197,17 @@ if __name__ == "__main__":
         #
         # log("Checking thread started.", "info", __print)
 
-        cli_thread = threading.Thread(target=listen_to_input())
-        cli_thread.start()
-
-        log("CLI thread started.", "info", __print)
+        # cli_thread = threading.Thread(target=listen_to_input())
+        # cli_thread.start()
+        #
+        # log("CLI thread started.", "info", __print)
 
         api_thread = threading.Thread(target=runApi())
         api_thread.start()
 
         log("API thread started.", "info", __print)
 
-        checking_thread.join()
+        # checking_thread.join()
         cli_thread.join()
         api_thread.join()
     except SystemExit as e:
