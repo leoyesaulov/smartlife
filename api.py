@@ -29,6 +29,7 @@ class StatusUpdateServicer(smartlife_pb2_grpc.StateUpdateServicer):
 # ToDo: refactor status variable naming
 def updStatus(new_status: bool):
     # we change owner_present and immediate check
+    print(f"Received updStatus api call with new status: {new_status}")
     state.owner_present = new_status
     cololight_strip.check()
 
