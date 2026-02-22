@@ -2,10 +2,10 @@ i lowkey want to rewrite this project with c, bc python delivers too much of a h
 
 ToDo:
 implement basic functionality first, expand later
-basics: check thread, api thread
+basics: check thread, api thread, status/active
 advanced: cli, timers, logging
 
 Notes:
 Calculate sunset: https://edwilliams.org/sunrise_sunset_algorithm.htm
-Call python: https://www.askpython.com/python/examples/calling-python-scripts-from-c
+Call python: https://www.askpython.com/python/examples/calling-python-scripts-from-c (or just implement cololight api yourself)
 gRPC: https://stackoverflow.com/questions/50953651/how-to-write-a-grpc-client-server-in-c
