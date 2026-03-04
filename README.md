@@ -1,3 +1,9 @@
+# REWRITE BRANCH
+Current fucntionality - none, work in progress. `make all` to compile and `./main.out` to run
+
+
+
+
 # Smartlife
 This project's goal is to automatisate my smarthome appliances.
 
