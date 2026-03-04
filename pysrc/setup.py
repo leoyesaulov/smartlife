@@ -1,4 +1,4 @@
-from data_handler import DataHandler
+from pysrc.data_handler import DataHandler
 
 data_handler = DataHandler()
 strip_ip = data_handler.get('strip_ip')

@@ -1,4 +1,4 @@
-from data_handler import DataHandler
+from pysrc.data_handler import DataHandler
 from geopy.geocoders import GeoNames
 from datetime import timezone, timedelta
 from astral import LocationInfo, Observer

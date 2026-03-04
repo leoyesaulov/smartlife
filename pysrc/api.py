@@ -1,8 +1,8 @@
 import grpc
-from common import state
+from pysrc.common import state
 from concurrent import futures
-from devices import cololight_strip
-from data_handler import DataHandler
+from pysrc.devices import cololight_strip
+from pysrc.data_handler import DataHandler
 from protobufs import smartlife_pb2, smartlife_pb2_grpc
 
 data_handler = DataHandler()

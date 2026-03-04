@@ -2,13 +2,13 @@ import sys
 import asyncio
 import traceback
 
-import common
-from api import runApi
-from logger import log
+from pysrc import common
+from pysrc.api import runApi
+from pysrc.logger import log
 from asyncio import sleep
-from common import  state
-from devices import cololight_strip
-from data_handler import DataHandler
+from pysrc.common import  state
+from pysrc.devices import cololight_strip
+from pysrc.data_handler import DataHandler
 
 
 async def run():
@@ -117,7 +117,7 @@ async def listen_to_input():
                 sys.exit(0)
 
             case {"command":"status", "param1":p1, "param2":p2}:
-                print(f"Current service status: owner_present: {common.state.owner_present}, service_active: {common.state.service_active}")
+                print(f"Current service status: owner_present: { common.state.owner_present}, service_active: { common.state.service_active}")
 
             case _:
                 __print(f"I'm sorry, I didn't understand that.\nExpected one of: 'on', 'off', 'timer', 'stop', 'city', 'changeloc', 'state', 'refresh', 'exit'. Got '{input_arr[0]}'.")

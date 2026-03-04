@@ -1,5 +1,5 @@
-from colo_strip import ColoStrip
-from data_handler import DataHandler
+from pysrc.colo_strip import ColoStrip
+from pysrc.data_handler import DataHandler
 
 device_counter = 0
 data_handler = DataHandler()

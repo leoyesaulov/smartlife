@@ -7,7 +7,7 @@ fmt = Formatter(
 )
 
 base_handler = FileHandler(
-    filename='.log',
+    filename='../.log',
     mode='a',
     encoding='utf-8',
 )
