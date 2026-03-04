@@ -15,7 +15,7 @@ run:
 
 makeC:
 	@echo 'I am compiling!'
-	gcc -std=c23 -Iinclude src/main.c -o main.out
+	gcc -std=c23 -Iinclude/* src/*.c -o main.out
 
 .PHONY: makeC
 

@@ -6,9 +6,12 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "../include/stripHandler.h"
+
 // Initializes data such as global vars before the application start. Returns 0 on success.
 int initData() {
     printf("Initializing data.\n");
+
 
     return 0;
 }
@@ -50,8 +53,9 @@ int runCLI() {
 
 int main(int argc, char* argv[]) {
 
-    if (initData()) {
-        printf("ERR: Data initialization failed.\n");
+    if (initStripHandler()) {
+        printf("ERR: Data initialization failed.\nAborting...\n");
+        return 1;
     }
 
     printf("Launching application.\n");
@@ -59,12 +63,14 @@ int main(int argc, char* argv[]) {
     // spawn threads to do the work for you
     pthread_t apiThread;
     if(pthread_create(&apiThread, nullptr, initAPI, NULL)) {
-        printf("ERR: API initialization failed.\n");
+        printf("ERR: API initialization failed.\nAborting...\n");
+        return 1;
     }
 
     pthread_t checkThread;
     if(pthread_create(&checkThread, nullptr, initCheck, NULL)) {
-        printf("ERR: Check-Loop initialization failed.\n");
+        printf("ERR: Check-Loop initialization failed.\nAborting...\n");
+        return 1;
     }
 
     printf("Application initialization finished.\n");
