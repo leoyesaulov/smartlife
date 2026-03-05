@@ -3,13 +3,12 @@
 //
 #include <stdio.h>
 #include <pthread.h>
-#include <stdint.h>
 #include <unistd.h>
 
-#include "../include/stripHandler.h"
+#include "../include/dataHandler.h"
 
 // Initializes data such as global vars before the application start. Returns 0 on success.
-int initData() {
+int initData(void) {
     printf("Initializing data.\n");
 
 
@@ -24,17 +23,17 @@ void* initAPI(void* arg) {
 }
 
 // does a singular check, return 0 on success
-int check() {
-
+int check(void) {
+    printf("Check has been performed.\n");
     return 0;
 }
 
-void checkLoop() {
+void checkLoop(void) {
     while (1) {
         // check if we should turn the lights on or off
         check();
         // sleep for 60 secs before the next check
-        sleep(60);
+        sleep(3);
     }
 }
 
@@ -45,20 +44,19 @@ void* initCheck(void* arg) {
     return NULL;
 }
 
-int runCLI() {
+int runCLI(void) {
 
     return 0;
 }
 
 
 int main(int argc, char* argv[]) {
+    printf("Launching application...\n");
 
-    if (initStripHandler()) {
+    if (initDataHandler()) {
         printf("ERR: Data initialization failed.\nAborting...\n");
         return 1;
     }
-
-    printf("Launching application.\n");
 
     // spawn threads to do the work for you
     pthread_t apiThread;

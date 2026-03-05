@@ -5,6 +5,9 @@ implement basic functionality first, expand later
 basics: check thread, api thread, status/active
 advanced: cli, timers, logging
 
+ToDo ideas:
+selective thread joining to abort everything on one thread's failure
+
 Notes:
 Calculate sunset: https://edwilliams.org/sunrise_sunset_algorithm.htm
 Call python: https://www.askpython.com/python/examples/calling-python-scripts-from-c (or just implement cololight api yourself)
